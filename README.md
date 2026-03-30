@@ -170,9 +170,3 @@ making the bot feel like a smart assistant rather than a noisy alarm system.
 - **Dashboard is read-only**: The dashboard displays run history and scores but
   does not provide a UI for approving updates — that still happens via GitHub
   Issue comments, which is intentional (one authoritative approval surface).
-
----
-
-## License
-
-MIT
