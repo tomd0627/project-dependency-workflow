@@ -1,0 +1,160 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Design Tokens — Deep Forest Command Center
+   All color, typography, spacing, and layout values live here.
+   Never hardcode hex values in component styles — always use these variables.
+───────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Color — backgrounds */
+  --color-bg-base: #0d1a12;
+  --color-bg-surface: #132118;
+  --color-bg-raised: #1a2e20;
+  --color-border: #2a4433;
+
+  /* Color — accents */
+  --color-accent-primary: #4ade80;
+  --color-accent-warm: #f59e0b;
+  --color-accent-danger: #f87171;
+
+  /* Color — text */
+  --color-text-primary: #e8f5ed;
+  --color-text-secondary: #8fbc9f;
+  --color-text-dim: #4a6b57;
+
+  /* Typography */
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-base: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* Spacing scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* Radii */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.6);
+
+  /* Layout breakpoints (used as min-width in media queries) */
+  --bp-tablet: 640px;
+  --bp-desktop: 1024px;
+
+  /* Sidebar */
+  --sidebar-width: 240px;
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+
+  /* Focus ring */
+  --focus-ring: 0 0 0 2px var(--color-bg-base), 0 0 0 4px var(--color-accent-primary);
+}
+
+/* ── Base reset & global styles ─────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  min-height: 100dvh;
+}
+
+/* ── Layout ──────────────────────────────────────────────────────────────────── */
+
+#app {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: 100dvh;
+}
+
+@media (min-width: 1024px) {
+  #app {
+    grid-template-columns: var(--sidebar-width) 1fr;
+  }
+}
+
+.sidebar {
+  background-color: var(--color-bg-surface);
+  border-right: 1px solid var(--color-border);
+}
+
+.main-content {
+  padding: var(--space-6);
+  overflow-y: auto;
+}
+
+/* ── Accessibility utilities ─────────────────────────────────────────────────── */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* ── Motion preference ───────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
