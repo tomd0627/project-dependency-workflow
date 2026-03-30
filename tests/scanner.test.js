@@ -238,8 +238,11 @@ describe("fetchLatestNpmVersion", () => {
 
 describe("detectEcosystems", () => {
   it("detects Node.js when package.json is present", async () => {
-    const octokit = makeOctokit(() =>
-      Promise.resolve(makeContentResponse('{"name":"test"}'))
+    const notFound = Object.assign(new Error("Not Found"), { status: 404 });
+    const octokit = makeOctokit((args) =>
+      args.path === "package.json"
+        ? Promise.resolve(makeContentResponse('{"name":"test"}'))
+        : Promise.reject(notFound)
     );
     const result = await detectEcosystems(octokit, "owner", "repo");
     expect(result).toHaveLength(1);
@@ -334,7 +337,12 @@ describe("scanRepository", () => {
 
   it("returns scan results for detected ecosystems", async () => {
     const pkg = makePackageJson({ dependencies: { lodash: "4.17.20" } });
-    const octokit = makeOctokit(() => Promise.resolve(makeContentResponse(pkg)));
+    const notFound = Object.assign(new Error("Not Found"), { status: 404 });
+    const octokit = makeOctokit((args) =>
+      args.path === "package.json"
+        ? Promise.resolve(makeContentResponse(pkg))
+        : Promise.reject(notFound)
+    );
     global.fetch = jest.fn().mockResolvedValue(makeJsonResponse({ version: "4.17.21" }));
 
     const results = await scanRepository(octokit, "owner", "repo");

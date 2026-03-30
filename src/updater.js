@@ -1,35 +1,75 @@
 /**
  * @fileoverview Package manager execution for each supported ecosystem.
  * Applies dependency updates by invoking the correct CLI tool for the
- * detected ecosystem.
+ * detected ecosystem. Operates on a locally cloned repository path.
  */
 
-import { logger } from "./logger.js";
+import { exec as cpExec } from "node:child_process";
+import { promisify } from "node:util";
 import { ECOSYSTEM } from "./constants.js";
+import { logger } from "./logger.js";
+
+const exec = promisify(cpExec);
 
 /**
- * Applies dependency updates for a Node.js repository using npm-check-updates.
- *
- * @param {object} params
- * @param {string} params.repoPath - Local path to the repository
- * @param {string[]} params.packages - Package names to update
- * @returns {Promise<void>}
+ * @typedef {object} PackageUpdate
+ * @property {string} name - Package name, e.g. "lodash" or "@octokit/rest"
+ * @property {string} version - Target version, e.g. "4.17.21"
  */
-export async function updateNodeDependencies({ repoPath, packages }) {
-  // TODO: implement ncu + npm install
-  logger.debug({ repoPath, packageCount: packages.length }, "Node.js updater — not yet implemented");
+
+/**
+ * Builds the list of `name@version` specifiers for `npm install`.
+ * Exported as a pure helper for unit testing.
+ *
+ * @param {PackageUpdate[]} packages
+ * @returns {string[]} e.g. ["lodash@4.17.21", "@octokit/rest@21.0.2"]
+ */
+export function buildNpmInstallArgs(packages) {
+  return packages.map(({ name, version }) => `${name}@${version}`);
 }
 
 /**
- * Dispatches to the correct updater based on ecosystem.
+ * Applies dependency updates for a Node.js repository using npm install.
+ * Writes updated versions directly into node_modules and package-lock.json.
  *
  * @param {object} params
- * @param {string} params.ecosystem - One of ECOSYSTEM constants
- * @param {string} params.repoPath
- * @param {string[]} params.packages
+ * @param {string} params.repoPath - Local path to the cloned repository
+ * @param {PackageUpdate[]} params.packages - Packages to update with target versions
+ * @returns {Promise<void>}
+ */
+export async function updateNodeDependencies({ repoPath, packages }) {
+  if (packages.length === 0) {
+    logger.debug({ repoPath }, "No packages to update — skipping npm install");
+    return;
+  }
+
+  const args = buildNpmInstallArgs(packages);
+  logger.info({ repoPath, packages: args }, "Installing updated Node.js packages");
+
+  const { stdout, stderr } = await exec(`npm install ${args.join(" ")}`, { cwd: repoPath });
+
+  if (stderr) logger.debug({ stderr }, "npm install stderr");
+  logger.debug({ stdout }, "npm install complete");
+}
+
+/**
+ * Dispatches to the correct updater based on the detected ecosystem.
+ * Throws for unsupported ecosystems so the caller can decide how to handle it.
+ *
+ * @param {object} params
+ * @param {string} params.ecosystem - One of the ECOSYSTEM constants
+ * @param {string} params.repoPath - Local path to the cloned repository
+ * @param {PackageUpdate[]} params.packages - Packages to update with target versions
  * @returns {Promise<void>}
  */
 export async function applyUpdates({ ecosystem, repoPath, packages }) {
-  // TODO: implement all ecosystems
-  logger.debug({ ecosystem, repoPath }, "Updater — not yet implemented");
+  switch (ecosystem) {
+    case ECOSYSTEM.NODE:
+      return updateNodeDependencies({ repoPath, packages });
+    default:
+      throw new Error(
+        `Unsupported ecosystem for automated update: "${ecosystem}". ` +
+        `Supported: ${ECOSYSTEM.NODE}`
+      );
+  }
 }

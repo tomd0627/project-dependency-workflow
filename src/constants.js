@@ -102,6 +102,25 @@ export const QA = /** @type {const} */ ({
   DEFAULT_TIMEOUT_MS: 5 * 60 * 1_000,
 });
 
+// ── Registry URLs ─────────────────────────────────────────────────────────────
+export const PYPI = /** @type {const} */ ({
+  REGISTRY_URL: "https://pypi.org/pypi",
+});
+
+export const CRATES = /** @type {const} */ ({
+  REGISTRY_URL: "https://crates.io/api/v1/crates",
+  /** crates.io requires a descriptive User-Agent on all API calls. */
+  USER_AGENT: "dep-bot/1.0 (https://github.com/tomdeluca/project-dependency-workflow)",
+});
+
+export const GO_PROXY = /** @type {const} */ ({
+  URL: "https://proxy.golang.org",
+});
+
+export const RUBYGEMS = /** @type {const} */ ({
+  REGISTRY_URL: "https://rubygems.org/api/v1/gems",
+});
+
 // ── npm registry ─────────────────────────────────────────────────────────────
 export const NPM = /** @type {const} */ ({
   REGISTRY_URL: "https://registry.npmjs.org",
@@ -128,6 +147,24 @@ export const LOG_LEVEL = /** @type {const} */ ({
   WARN: "warn",
   ERROR: "error",
   FATAL: "fatal",
+});
+
+// ── GitHub Advisory Database — ecosystem enum values ─────────────────────────
+// Maps internal ECOSYSTEM keys to the SecurityAdvisoryEcosystem GraphQL enum.
+export const ADVISORY_ECOSYSTEM = /** @type {const} */ ({
+  node: "NPM",
+  python: "PIP",
+  rust: "RUST",
+  go: "GO",
+  ruby: "RUBYGEMS",
+});
+
+// ── Notifier ──────────────────────────────────────────────────────────────────
+export const NOTIFIER = /** @type {const} */ ({
+  ISSUE_TITLE_PREFIX: "deps: dependency update report",
+  /** Discord enforces a 2 000-character limit on message content. */
+  DISCORD_CONTENT_LIMIT: 2_000,
+  NTFY_BASE_URL: "https://ntfy.sh",
 });
 
 // ── Dry run ───────────────────────────────────────────────────────────────────
