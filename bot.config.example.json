@@ -1,6 +1,6 @@
 {
   "schedule": "0 8 * * 1",
-  "github_username": "",
+  "github_username": "your-github-username",
   "excluded_repos": [],
   "priority_repos": [],
   "notification_webhook": "",

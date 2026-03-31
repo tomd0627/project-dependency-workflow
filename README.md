@@ -57,7 +57,10 @@ flowchart TD
    ```
 
 3. **Configure the bot**
-   Edit `bot.config.json` and set at minimum:
+   ```bash
+   cp bot.config.example.json bot.config.json
+   ```
+   Then edit `bot.config.json` and set at minimum:
    ```json
    {
      "github_username": "your-github-username"
