@@ -353,9 +353,12 @@ section + section {
 /* ── Update table ────────────────────────────────────────────────────────── */
 
 .table-wrapper {
-  overflow-x: auto;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
+}
+
+.table-scroll {
+  overflow-x: auto;
 }
 
 .update-table {
