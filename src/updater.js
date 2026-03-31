@@ -46,7 +46,21 @@ export async function updateNodeDependencies({ repoPath, packages }) {
   const args = buildNpmInstallArgs(packages);
   logger.info({ repoPath, packages: args }, "Installing updated Node.js packages");
 
-  const { stdout, stderr } = await exec(`npm install ${args.join(" ")}`, { cwd: repoPath });
+  let stdout, stderr;
+  try {
+    ({ stdout, stderr } = await exec(`npm install ${args.join(" ")}`, { cwd: repoPath }));
+  } catch (err) {
+    if (!err.message?.includes("ERESOLVE")) throw err;
+
+    logger.warn(
+      { repoPath, packages: args },
+      "npm install failed with ERESOLVE peer conflict — retrying with --legacy-peer-deps"
+    );
+    ({ stdout, stderr } = await exec(
+      `npm install --legacy-peer-deps ${args.join(" ")}`,
+      { cwd: repoPath }
+    ));
+  }
 
   if (stderr) logger.debug({ stderr }, "npm install stderr");
   logger.debug({ stdout }, "npm install complete");
