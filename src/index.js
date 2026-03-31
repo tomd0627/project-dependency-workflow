@@ -32,7 +32,7 @@ import { createOctokitClient, discoverRepositories } from "./discovery.js";
 import { waitForApproval } from "./gate.js";
 import { logger } from "./logger.js";
 import { createReportIssue, sendWebhookNotification } from "./notifier.js";
-import { createUpdateBranch, openPullRequest } from "./publisher.js";
+import { createUpdateBranch, deleteUpdateBranch, openPullRequest } from "./publisher.js";
 import { detectBuildCommand, detectTestCommand, runTestSuite } from "./qa.js";
 import { scanRepository } from "./scanner.js";
 import { applyUpdates } from "./updater.js";
@@ -364,6 +364,7 @@ async function processEcosystem({ octokit, client, token, owner, repo, scanResul
   }
 
   if (qaFailed) {
+    await deleteUpdateBranch({ octokit, owner, repo, branch, dryRun });
     if (issueResult && !dryRun) {
       await octokit.rest.issues.createComment({
         owner,

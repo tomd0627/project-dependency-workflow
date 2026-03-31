@@ -126,6 +126,32 @@ export async function createUpdateBranch({ octokit, owner, repo, date, dryRun = 
   );
 }
 
+// ── Branch deletion ───────────────────────────────────────────────────────────
+
+/**
+ * Deletes a branch from the remote repository.
+ * Silently no-ops in dry-run mode. Logs a warning on failure rather than
+ * throwing — a cleanup failure must never mask the original error.
+ *
+ * @param {object} params
+ * @param {import('@octokit/rest').Octokit} params.octokit
+ * @param {string} params.owner
+ * @param {string} params.repo
+ * @param {string} params.branch
+ * @param {boolean} [params.dryRun]
+ * @returns {Promise<void>}
+ */
+export async function deleteUpdateBranch({ octokit, owner, repo, branch, dryRun = false }) {
+  if (dryRun) return;
+
+  try {
+    await octokit.rest.git.deleteRef({ owner, repo, ref: `heads/${branch}` });
+    logger.info({ owner, repo, branch }, "Stale update branch deleted");
+  } catch (err) {
+    logger.warn({ owner, repo, branch, error: err.message }, "Failed to delete stale update branch");
+  }
+}
+
 // ── Pull request ──────────────────────────────────────────────────────────────
 
 /**
