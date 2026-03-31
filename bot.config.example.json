@@ -12,5 +12,7 @@
   "auto_approve_major": false,
   "risk_threshold_auto_approve": 50,
   "dry_run": false,
-  "cache_ttl_hours": 24
+  "cache_ttl_hours": 24,
+  "scan_ecosystems": null,
+  "repo_concurrency": 3
 }

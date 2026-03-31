@@ -116,6 +116,8 @@ flowchart TD
 | `risk_threshold_auto_approve` | number | `50` | Risk scores above this always require manual approval via the gate. |
 | `dry_run` | boolean | `false` | Run the full pipeline without applying any changes. |
 | `cache_ttl_hours` | number | `24` | How long changelog analysis results are cached. |
+| `scan_ecosystems` | string[] \| null | `null` | Limit ecosystem detection to specific ecosystems (e.g. `["node"]`). `null` checks all supported ecosystems. |
+| `repo_concurrency` | number | `3` | Number of repositories to process in parallel. Increase for large portfolios; decrease if hitting GitHub rate limits. |
 
 ---
 

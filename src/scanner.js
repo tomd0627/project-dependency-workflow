@@ -546,8 +546,12 @@ const ECOSYSTEM_CHECKS = [
  * @param {string} repo
  * @returns {Promise<Array<{ ecosystem: string; manifest: string }>>}
  */
-export async function detectEcosystems(octokit, owner, repo) {
-  const checks = ECOSYSTEM_CHECKS.map(({ ecosystem, manifests }) => async () => {
+export async function detectEcosystems(octokit, owner, repo, allowedEcosystems) {
+  const checksToRun = allowedEcosystems
+    ? ECOSYSTEM_CHECKS.filter(({ ecosystem }) => allowedEcosystems.includes(ecosystem))
+    : ECOSYSTEM_CHECKS;
+
+  const checks = checksToRun.map(({ ecosystem, manifests }) => async () => {
     for (const manifest of manifests) {
       const content = await fetchManifestContent(octokit, owner, repo, manifest);
       if (content !== null) return { ecosystem, manifest };
@@ -628,10 +632,11 @@ export async function scanNodeEcosystem(octokit, owner, repo) {
  * @param {import('@octokit/rest').Octokit} octokit
  * @param {string} owner
  * @param {string} repo
+ * @param {string[] | undefined} [allowedEcosystems] - If set, only probe for these ecosystems
  * @returns {Promise<ScanResult[]>}
  */
-export async function scanRepository(octokit, owner, repo) {
-  const ecosystems = await detectEcosystems(octokit, owner, repo);
+export async function scanRepository(octokit, owner, repo, allowedEcosystems) {
+  const ecosystems = await detectEcosystems(octokit, owner, repo, allowedEcosystems);
 
   if (ecosystems.length === 0) {
     logger.info({ owner, repo }, "No recognized ecosystems found — skipping scan");

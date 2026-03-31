@@ -388,26 +388,38 @@ async function run() {
     repositories: [],
   };
 
-  for (const repoMeta of repos) {
+  // Concurrency limit for parallel repo processing. Keeps GitHub API usage
+  // well within secondary rate limits while still processing repos in parallel.
+  const REPO_CONCURRENCY = config.repo_concurrency ?? 3;
+  const allowedEcosystems = config.scan_ecosystems ?? null;
+
+  /**
+   * Processes a single repository through SCAN → PUSH and returns all
+   * run-report entries for it (one per ecosystem with updates).
+   *
+   * @param {object} repoMeta
+   * @returns {Promise<object[]>}
+   */
+  async function processRepo(repoMeta) {
     const owner = repoMeta.owner.login;
     const repo = repoMeta.name;
 
-    // ── SCAN ───────────────────────────────────────────────────────────────────
+    // ── SCAN ─────────────────────────────────────────────────────────────────
     logger.info({ repo: repoMeta.full_name, stage: STAGE.SCAN }, "Scanning repository");
 
     let scanResults;
     try {
-      scanResults = await scanRepository(octokit, owner, repo);
+      scanResults = await scanRepository(octokit, owner, repo, allowedEcosystems);
     } catch (err) {
       logger.error({ repo: repoMeta.full_name, error: err.message }, "Scan failed — skipping");
-      continue;
+      return [];
     }
 
     const ecosystemsWithUpdates = scanResults.filter((r) => r.outdated.length > 0);
 
     if (ecosystemsWithUpdates.length === 0) {
       logger.info({ repo: repoMeta.full_name }, "All dependencies up to date");
-      continue;
+      return [];
     }
 
     logger.info(
@@ -415,8 +427,7 @@ async function run() {
       "Outdated dependencies found"
     );
 
-    // Process each detected ecosystem independently so a failure in one does
-    // not block the others.
+    const entries = [];
     for (const scanResult of ecosystemsWithUpdates) {
       try {
         const entry = await processEcosystem({
@@ -431,13 +442,23 @@ async function run() {
           ntfyTopic,
           dryRun,
         });
-        runReport.repositories.push(entry);
+        entries.push(entry);
       } catch (err) {
         logger.error(
           { repo: repoMeta.full_name, ecosystem: scanResult.ecosystem, error: err.message },
           "Ecosystem processing failed — continuing"
         );
       }
+    }
+    return entries;
+  }
+
+  // Process repos in parallel batches to stay within API rate limits.
+  for (let i = 0; i < repos.length; i += REPO_CONCURRENCY) {
+    const batch = repos.slice(i, i + REPO_CONCURRENCY);
+    const batchResults = await Promise.all(batch.map(processRepo));
+    for (const entries of batchResults) {
+      runReport.repositories.push(...entries);
     }
   }
 
