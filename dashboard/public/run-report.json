@@ -1,0 +1,650 @@
+{
+  "runAt": "2026-03-31T14:52:55.830Z",
+  "durationSeconds": 433.9,
+  "repositories": [
+    {
+      "name": "tomd0627/multi-step-form",
+      "ecosystem": "node",
+      "updates": [
+        {
+          "packageName": "@hookform/resolvers",
+          "currentVersion": "3.9.0",
+          "latestVersion": "5.2.2",
+          "updateType": "major",
+          "riskScore": 75,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "This is a major version upgrade spanning from v3.9.0 to v5.2.2, which typically indicates breaking changes. The provided changelog only shows a recent bug fix for Zod 4 resolver output types, but doesn't include the full changelog for all intermediate major versions. Given the significant version jump and lack of complete changelog information, this upgrade requires careful review and testing.",
+          "breakingChanges": [
+            "Major version upgrade from v3 to v5 likely contains breaking API changes",
+            "Potential changes to resolver function signatures or behavior",
+            "Possible updates to TypeScript types and interfaces"
+          ],
+          "ramifications": [
+            "Application code using resolvers may need updates to match new API",
+            "TypeScript compilation errors may occur if types have changed",
+            "Form validation behavior could be affected",
+            "Dependency on specific validation library versions may have changed",
+            "Runtime errors possible if breaking changes affect current usage patterns"
+          ],
+          "changelogUrl": "https://github.com/react-hook-form/resolvers/compare/v5.2.1...v5.2.2",
+          "advisories": []
+        },
+        {
+          "packageName": "framer-motion",
+          "currentVersion": "11.3.0",
+          "latestVersion": "12.38.0",
+          "updateType": "major",
+          "riskScore": 75,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "This is a major version upgrade from 11.3.0 to 12.38.0 with no changelog provided, making it impossible to assess specific changes. Major version updates typically introduce breaking changes that require code modifications and thorough testing.",
+          "breakingChanges": [
+            "Unknown breaking changes due to missing changelog",
+            "Potential API changes in major version upgrade",
+            "Possible component prop changes",
+            "Animation API modifications likely"
+          ],
+          "ramifications": [
+            "Existing animations may break or behave differently",
+            "Component implementations may need updates",
+            "TypeScript types may have changed requiring code adjustments",
+            "Performance characteristics could be altered",
+            "Testing suite will need comprehensive validation"
+          ],
+          "changelogUrl": null,
+          "advisories": []
+        },
+        {
+          "packageName": "lucide-react",
+          "currentVersion": "0.441.0",
+          "latestVersion": "1.7.0",
+          "updateType": "major",
+          "riskScore": 75,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "This is a major version upgrade from 0.441.0 to 1.7.0, indicating potential breaking changes despite the changelog only showing minor fixes and additions. The changelog appears incomplete for such a significant version jump, suggesting there may be undocumented breaking changes between these versions. Thorough testing is recommended before upgrading.",
+          "breakingChanges": [
+            "Major version bump from 0.x to 1.x typically indicates breaking changes",
+            "Potential API changes not documented in the provided changelog excerpt"
+          ],
+          "ramifications": [
+            "Dynamic import fixes may change how icons are loaded or bundled",
+            "Applications relying on specific import patterns may need updates",
+            "Bundle size or performance characteristics may change",
+            "TypeScript types may have changed between major versions"
+          ],
+          "changelogUrl": "https://github.com/lucide-icons/lucide/compare/1.6.0...1.7.0",
+          "advisories": []
+        },
+        {
+          "packageName": "react",
+          "currentVersion": "18.3.1",
+          "latestVersion": "19.2.4",
+          "updateType": "major",
+          "riskScore": 75,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "This is a major version upgrade from React 18 to React 19, which typically introduces significant breaking changes and new features. The changelog mentions security improvements for Server Components and Server Actions, but a major version bump usually includes API changes, deprecations, and potential compatibility issues with existing code.",
+          "breakingChanges": [
+            "Major version upgrade likely includes breaking API changes",
+            "Potential changes to component lifecycle methods",
+            "Possible updates to TypeScript definitions",
+            "Changes to React Server Components behavior"
+          ],
+          "ramifications": [
+            "Existing components may need refactoring",
+            "Third-party libraries may not be compatible with React 19",
+            "Build processes and tooling may require updates",
+            "Extensive testing required across all application features",
+            "Development team will need time to learn new patterns and APIs"
+          ],
+          "changelogUrl": "https://github.com/facebook/react/releases/tag/v19.2.4",
+          "advisories": [
+            {
+              "ghsaId": "GHSA-hg79-j56m-fxgv",
+              "severity": "HIGH",
+              "summary": "Cross-Site Scripting in react",
+              "affectedRange": ">= 0.0.1, < 0.14.0",
+              "patchedVersion": "0.14.0",
+              "packageName": "react"
+            },
+            {
+              "ghsaId": "GHSA-g53w-52xc-2j85",
+              "severity": "MODERATE",
+              "summary": "Cross-Site Scripting in react",
+              "affectedRange": ">= 0.5.0, < 0.5.2",
+              "patchedVersion": "0.5.2",
+              "packageName": "react"
+            },
+            {
+              "ghsaId": "GHSA-g53w-52xc-2j85",
+              "severity": "MODERATE",
+              "summary": "Cross-Site Scripting in react",
+              "affectedRange": ">= 0.4.0, < 0.4.2",
+              "patchedVersion": "0.4.2",
+              "packageName": "react"
+            }
+          ]
+        },
+        {
+          "packageName": "react-dom",
+          "currentVersion": "unknown",
+          "latestVersion": "19.2.4",
+          "updateType": "patch",
+          "riskScore": 50,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "Analysis unavailable — Claude API failed after retries.",
+          "breakingChanges": [],
+          "ramifications": [],
+          "changelogUrl": "https://github.com/facebook/react/releases/tag/v19.2.4",
+          "advisories": [
+            {
+              "ghsaId": "GHSA-mvjj-gqq2-p4hw",
+              "severity": "MODERATE",
+              "summary": "Cross-Site Scripting in react-dom",
+              "affectedRange": ">= 16.4.0, < 16.4.2",
+              "patchedVersion": "16.4.2",
+              "packageName": "react-dom"
+            },
+            {
+              "ghsaId": "GHSA-mvjj-gqq2-p4hw",
+              "severity": "MODERATE",
+              "summary": "Cross-Site Scripting in react-dom",
+              "affectedRange": ">= 16.3.0, < 16.3.3",
+              "patchedVersion": "16.3.3",
+              "packageName": "react-dom"
+            },
+            {
+              "ghsaId": "GHSA-mvjj-gqq2-p4hw",
+              "severity": "MODERATE",
+              "summary": "Cross-Site Scripting in react-dom",
+              "affectedRange": "= 16.2.0",
+              "patchedVersion": "16.2.1",
+              "packageName": "react-dom"
+            },
+            {
+              "ghsaId": "GHSA-mvjj-gqq2-p4hw",
+              "severity": "MODERATE",
+              "summary": "Cross-Site Scripting in react-dom",
+              "affectedRange": ">= 16.1.0, < 16.1.2",
+              "patchedVersion": "16.1.2",
+              "packageName": "react-dom"
+            },
+            {
+              "ghsaId": "GHSA-mvjj-gqq2-p4hw",
+              "severity": "MODERATE",
+              "summary": "Cross-Site Scripting in react-dom",
+              "affectedRange": "= 16.0.0",
+              "patchedVersion": "16.0.1",
+              "packageName": "react-dom"
+            }
+          ]
+        },
+        {
+          "packageName": "react-hook-form",
+          "currentVersion": "7.53.0",
+          "latestVersion": "7.72.0",
+          "updateType": "minor",
+          "riskScore": 25,
+          "recommendation": "THUMBS_UP",
+          "summary": "This minor update introduces a new built-in form validation feature and includes several bug fixes for useFieldArray dirty field tracking and checkbox validation. The changes are additive with backward compatibility maintained, making this a relatively safe upgrade.",
+          "breakingChanges": [],
+          "ramifications": [
+            "New form-level validate option available in useForm configuration",
+            "Improved dirty field tracking behavior in useFieldArray",
+            "Fixed checkbox validation issues with native validation",
+            "Enhanced formState tracking for submit state subscriptions"
+          ],
+          "changelogUrl": "https://github.com/react-hook-form/react-hook-form/releases/tag/v7.72.0",
+          "advisories": []
+        },
+        {
+          "packageName": "zod",
+          "currentVersion": "3.23.8",
+          "latestVersion": "4.3.6",
+          "updateType": "major",
+          "riskScore": 85,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "This is a major version upgrade from zod v3 to v4, which typically introduces breaking changes and API modifications. The provided changelog only shows minor commits and bug fixes, suggesting the major breaking changes occurred in earlier v4 releases not shown here. Major version upgrades require careful testing and potential code refactoring.",
+          "breakingChanges": [
+            "Major version bump indicates breaking API changes",
+            "Potential schema validation behavior changes",
+            "Possible TypeScript type definition modifications"
+          ],
+          "ramifications": [
+            "Existing zod schemas may need to be updated or refactored",
+            "TypeScript compilation errors may occur due to type changes",
+            "Runtime validation behavior could change affecting application logic",
+            "Dependent packages using zod may also need updates",
+            "Thorough testing required across all validation use cases"
+          ],
+          "changelogUrl": "https://github.com/colinhacks/zod/releases/tag/v4.3.6",
+          "advisories": [
+            {
+              "ghsaId": "GHSA-m95q-7qp3-xv42",
+              "severity": "MODERATE",
+              "summary": "Zod denial of service vulnerability",
+              "affectedRange": "<= 3.22.2",
+              "patchedVersion": "3.22.3",
+              "packageName": "zod"
+            }
+          ]
+        },
+        {
+          "packageName": "@eslint/js",
+          "currentVersion": "9.9.0",
+          "latestVersion": "10.0.1",
+          "updateType": "major",
+          "riskScore": 75,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "This is a major version upgrade that includes security fixes for minimatch vulnerabilities and adds eslint as a peer dependency. While the changes appear to be primarily maintenance and security-focused, the major version bump and peer dependency addition could potentially cause compatibility issues.",
+          "breakingChanges": [
+            "Added eslint to peerDependencies which may require explicit installation",
+            "Major version increment may indicate breaking API changes not detailed in changelog"
+          ],
+          "ramifications": [
+            "May require updating build processes to ensure eslint peer dependency is satisfied",
+            "Could affect projects that rely on transitive eslint dependencies",
+            "Security vulnerability fixes in minimatch improve overall security posture",
+            "Error message updates may affect tooling that parses ESLint output"
+          ],
+          "changelogUrl": "https://github.com/eslint/eslint/releases/tag/v10.0.1",
+          "advisories": []
+        },
+        {
+          "packageName": "@types/react",
+          "currentVersion": "18.3.5",
+          "latestVersion": "19.2.14",
+          "updateType": "major",
+          "riskScore": 75,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "This is a major version upgrade for React type definitions that likely includes breaking changes and new type requirements. Major version bumps in @types/react typically align with React's major releases and can introduce significant API changes that require code modifications.",
+          "breakingChanges": [
+            "Potential removal of deprecated type definitions",
+            "Changes to component prop types and interfaces",
+            "Updates to hook type signatures",
+            "Possible changes to JSX element types"
+          ],
+          "ramifications": [
+            "TypeScript compilation errors requiring code updates",
+            "Need to update React library to compatible version",
+            "Potential impact on all React components and hooks",
+            "Third-party libraries may need compatibility updates",
+            "Development workflow disruption during migration"
+          ],
+          "changelogUrl": null,
+          "advisories": []
+        },
+        {
+          "packageName": "@types/react-dom",
+          "currentVersion": "18.3.0",
+          "latestVersion": "19.2.3",
+          "updateType": "major",
+          "riskScore": 75,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "This is a major version upgrade of React DOM type definitions from v18 to v19, which likely includes breaking changes in type signatures and API definitions. Without a changelog provided, the exact breaking changes are unknown, but major React version upgrades typically introduce significant type system changes. Thorough testing of TypeScript compilation and type checking is essential before upgrading.",
+          "breakingChanges": [
+            "Potential breaking changes in React DOM type definitions",
+            "Possible removal or modification of deprecated type exports",
+            "Changes in component prop type definitions",
+            "Updates to event handler type signatures"
+          ],
+          "ramifications": [
+            "TypeScript compilation errors may occur if using removed or changed types",
+            "Need to update code that relies on deprecated type definitions",
+            "Potential need to update related React and React DOM packages to compatible versions",
+            "May require updates to component type annotations and prop interfaces"
+          ],
+          "changelogUrl": null,
+          "advisories": []
+        },
+        {
+          "packageName": "@vitejs/plugin-react",
+          "currentVersion": "4.3.1",
+          "latestVersion": "6.0.1",
+          "updateType": "major",
+          "riskScore": 75,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "This is a major version upgrade spanning two major versions (4.x to 6.x) which typically indicates significant breaking changes. Without access to the changelog, the risk is elevated due to the potential for API changes, dependency updates, and configuration modifications. Thorough testing and review of migration documentation will be essential.",
+          "breakingChanges": [
+            "Potential API changes due to major version jump",
+            "Possible configuration format changes",
+            "Updated peer dependency requirements",
+            "Removed deprecated features from v4.x"
+          ],
+          "ramifications": [
+            "Build process may fail without configuration updates",
+            "Development server behavior could change",
+            "Plugin options may need modification",
+            "React Fast Refresh functionality could be affected",
+            "Integration with Vite core may require adjustments"
+          ],
+          "changelogUrl": null,
+          "advisories": []
+        },
+        {
+          "packageName": "eslint",
+          "currentVersion": "9.9.0",
+          "latestVersion": "10.1.0",
+          "updateType": "major",
+          "riskScore": 75,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "This is a major version update from ESLint 9.9.0 to 10.1.0 which typically indicates breaking changes. The changelog shows new features like bulk-suppressions API support and improvements to the no-var rule, along with various bug fixes and documentation updates. As a major version bump, this upgrade requires careful testing to ensure compatibility with existing configurations and rules.",
+          "breakingChanges": [
+            "Major version upgrade typically includes breaking changes to APIs, configuration formats, or rule behaviors",
+            "Potential changes to ESLint core APIs and rule engine behavior",
+            "Configuration file format or plugin compatibility changes may be present"
+          ],
+          "ramifications": [
+            "Existing ESLint configurations may need updates to work with version 10.x",
+            "Custom rules or plugins may require updates for compatibility",
+            "CI/CD pipelines may fail if they depend on specific ESLint 9.x behaviors",
+            "Team members will need to upgrade their local ESLint installations",
+            "Integration with IDEs and editors may require plugin updates"
+          ],
+          "changelogUrl": "https://github.com/eslint/eslint/releases/tag/v10.1.0",
+          "advisories": [
+            {
+              "ghsaId": "GHSA-p5wg-g6qr-c7cg",
+              "severity": "MODERATE",
+              "summary": "Withdrawn Advisory: eslint has a Stack Overflow when serializing objects with circular references",
+              "affectedRange": "< 9.26.0",
+              "patchedVersion": "9.26.0",
+              "packageName": "eslint"
+            },
+            {
+              "ghsaId": "GHSA-jcgq-xh2f-2hfm",
+              "severity": "MODERATE",
+              "summary": "Regular Expression Denial of Service",
+              "affectedRange": "< 4.18.2",
+              "patchedVersion": "4.18.2",
+              "packageName": "eslint"
+            }
+          ]
+        },
+        {
+          "packageName": "eslint-plugin-jsx-a11y",
+          "currentVersion": "6.10.0",
+          "latestVersion": "6.10.2",
+          "updateType": "patch",
+          "riskScore": 15,
+          "recommendation": "THUMBS_UP",
+          "summary": "This is a low-risk patch update that primarily adds test coverage and documentation improvements. The only functional change is allowing `role=\"img\"` on SVG images in the `no-redundant-roles` rule, which is a sensible accessibility enhancement that relaxes rather than tightens restrictions.",
+          "breakingChanges": [],
+          "ramifications": [
+            "The `no-redundant-roles` rule will no longer flag `<img src=\"*.svg\" role=\"img\" />` as redundant, potentially reducing false positive linting errors",
+            "Internal refactoring to avoid array spreading may have minor performance implications but should not affect rule behavior",
+            "Enhanced test coverage may catch edge cases in future development but doesn't affect current functionality"
+          ],
+          "changelogUrl": "https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/compare/v6.10.1...v6.10.2",
+          "advisories": []
+        },
+        {
+          "packageName": "eslint-plugin-react-hooks",
+          "currentVersion": "5.1.0",
+          "latestVersion": "7.0.1",
+          "updateType": "major",
+          "riskScore": 75,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "This is a major version upgrade from 5.1.0 to 7.0.1, skipping version 6 entirely. Without changelog information, this represents significant uncertainty as major versions typically introduce breaking changes in ESLint plugins.",
+          "breakingChanges": [
+            "Potential rule configuration changes",
+            "Possible new rules with different default settings",
+            "Potential deprecation of existing rules",
+            "Changes to rule severity or enforcement"
+          ],
+          "ramifications": [
+            "Existing ESLint configurations may need updates",
+            "CI/CD pipelines could fail due to new linting errors",
+            "Development workflow disruption from new or changed rules",
+            "Potential false positives or missed React Hooks violations",
+            "Team may need to update coding standards and practices"
+          ],
+          "changelogUrl": null,
+          "advisories": []
+        },
+        {
+          "packageName": "eslint-plugin-react-refresh",
+          "currentVersion": "0.4.11",
+          "latestVersion": "0.5.2",
+          "updateType": "minor",
+          "riskScore": 25,
+          "recommendation": "THUMBS_UP",
+          "summary": "This is a minor version update that adds support for nested function calls for extraHOCs, which appears to be a bug fix enhancement. The change is targeted and specific, addressing a known issue without introducing breaking changes. ESLint plugins typically have low upgrade risk when they add new functionality without removing existing features.",
+          "breakingChanges": [],
+          "ramifications": [
+            "Improved detection of Higher-Order Components (HOCs) in nested function call scenarios",
+            "May catch additional React Refresh violations that were previously missed",
+            "Could potentially flag new code patterns that weren't previously detected"
+          ],
+          "changelogUrl": "https://github.com/ArnaudBarre/eslint-plugin-react-refresh/releases/tag/v0.5.2",
+          "advisories": []
+        },
+        {
+          "packageName": "globals",
+          "currentVersion": "15.9.0",
+          "latestVersion": "17.4.0",
+          "updateType": "major",
+          "riskScore": 75,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "This is a major version upgrade spanning from v15.9.0 to v17.4.0, which typically indicates breaking changes. The changelog provided is minimal and lacks detailed information about what changed between these versions, making it difficult to assess the full impact.",
+          "breakingChanges": [
+            "Major version bump from v15 to v17 suggests breaking changes",
+            "Insufficient changelog details to identify specific breaking changes"
+          ],
+          "ramifications": [
+            "Code that relies on globals package may break due to API changes",
+            "Build processes and linting configurations may need updates",
+            "Integration with other tools that depend on globals structure may fail",
+            "Testing required to ensure compatibility with existing codebase"
+          ],
+          "changelogUrl": "https://github.com/sindresorhus/globals/compare/v17.3.0...v17.4.0",
+          "advisories": []
+        },
+        {
+          "packageName": "typescript",
+          "currentVersion": "unknown",
+          "latestVersion": "6.0.2",
+          "updateType": "patch",
+          "riskScore": 50,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "Analysis unavailable — Claude API failed after retries.",
+          "breakingChanges": [],
+          "ramifications": [],
+          "changelogUrl": "https://github.com/microsoft/TypeScript/releases/tag/v6.0.2",
+          "advisories": []
+        },
+        {
+          "packageName": "typescript-eslint",
+          "currentVersion": "8.3.0",
+          "latestVersion": "8.58.0",
+          "updateType": "minor",
+          "riskScore": 25,
+          "recommendation": "THUMBS_UP",
+          "summary": "This minor update adds TypeScript 6 support and fixes several ESLint rule crashes and edge cases. The changes are primarily additive with bug fixes that improve stability.",
+          "breakingChanges": [],
+          "ramifications": [
+            "TypeScript 6 support may require updating TypeScript dependency",
+            "Fixed crashes in no-unnecessary-type-arguments rule may change linting behavior",
+            "Index signature handling changes in no-extraneous-class rule may affect class validation",
+            "RegExp flag handling improvements in prefer-regexp-exec may change auto-fix behavior"
+          ],
+          "changelogUrl": "https://github.com/typescript-eslint/typescript-eslint/releases/tag/v8.58.0",
+          "advisories": []
+        },
+        {
+          "packageName": "vite",
+          "currentVersion": "unknown",
+          "latestVersion": "8.0.3",
+          "updateType": "patch",
+          "riskScore": 50,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "Analysis unavailable — Claude API failed after retries.",
+          "breakingChanges": [],
+          "ramifications": [],
+          "changelogUrl": "https://github.com/vitejs/vite/releases/tag/v8.0.3",
+          "advisories": [
+            {
+              "ghsaId": "GHSA-93m4-6634-74q7",
+              "severity": "MODERATE",
+              "summary": "vite allows server.fs.deny bypass via backslash on Windows",
+              "affectedRange": ">= 5.2.6, <= 5.4.20",
+              "patchedVersion": "5.4.21",
+              "packageName": "vite"
+            },
+            {
+              "ghsaId": "GHSA-93m4-6634-74q7",
+              "severity": "MODERATE",
+              "summary": "vite allows server.fs.deny bypass via backslash on Windows",
+              "affectedRange": ">= 4.5.3, < 5.0.0",
+              "patchedVersion": "5.4.21",
+              "packageName": "vite"
+            },
+            {
+              "ghsaId": "GHSA-93m4-6634-74q7",
+              "severity": "MODERATE",
+              "summary": "vite allows server.fs.deny bypass via backslash on Windows",
+              "affectedRange": ">= 3.2.9, < 4.0.0",
+              "patchedVersion": "5.4.21",
+              "packageName": "vite"
+            },
+            {
+              "ghsaId": "GHSA-93m4-6634-74q7",
+              "severity": "MODERATE",
+              "summary": "vite allows server.fs.deny bypass via backslash on Windows",
+              "affectedRange": ">= 2.9.18, < 3.0.0",
+              "patchedVersion": "5.4.21",
+              "packageName": "vite"
+            },
+            {
+              "ghsaId": "GHSA-93m4-6634-74q7",
+              "severity": "MODERATE",
+              "summary": "vite allows server.fs.deny bypass via backslash on Windows",
+              "affectedRange": ">= 6.0.0, <= 6.4.0",
+              "patchedVersion": "6.4.1",
+              "packageName": "vite"
+            },
+            {
+              "ghsaId": "GHSA-93m4-6634-74q7",
+              "severity": "MODERATE",
+              "summary": "vite allows server.fs.deny bypass via backslash on Windows",
+              "affectedRange": ">= 7.0.0, <= 7.0.7",
+              "patchedVersion": "7.0.8",
+              "packageName": "vite"
+            },
+            {
+              "ghsaId": "GHSA-93m4-6634-74q7",
+              "severity": "MODERATE",
+              "summary": "vite allows server.fs.deny bypass via backslash on Windows",
+              "affectedRange": ">= 7.1.0, <= 7.1.10",
+              "patchedVersion": "7.1.11",
+              "packageName": "vite"
+            },
+            {
+              "ghsaId": "GHSA-g4jq-h2w9-997c",
+              "severity": "LOW",
+              "summary": "Vite middleware may serve files starting with the same name with the public directory",
+              "affectedRange": "<= 5.4.19",
+              "patchedVersion": "5.4.20",
+              "packageName": "vite"
+            },
+            {
+              "ghsaId": "GHSA-g4jq-h2w9-997c",
+              "severity": "LOW",
+              "summary": "Vite middleware may serve files starting with the same name with the public directory",
+              "affectedRange": ">= 6.0.0, <= 6.3.5",
+              "patchedVersion": "6.3.6",
+              "packageName": "vite"
+            },
+            {
+              "ghsaId": "GHSA-g4jq-h2w9-997c",
+              "severity": "LOW",
+              "summary": "Vite middleware may serve files starting with the same name with the public directory",
+              "affectedRange": ">= 7.0.0, <= 7.0.6",
+              "patchedVersion": "7.0.7",
+              "packageName": "vite"
+            },
+            {
+              "ghsaId": "GHSA-g4jq-h2w9-997c",
+              "severity": "LOW",
+              "summary": "Vite middleware may serve files starting with the same name with the public directory",
+              "affectedRange": ">= 7.1.0, <= 7.1.4",
+              "patchedVersion": "7.1.5",
+              "packageName": "vite"
+            },
+            {
+              "ghsaId": "GHSA-jqfw-vq24-v9c3",
+              "severity": "LOW",
+              "summary": "Vite's `server.fs` settings were not applied to HTML files",
+              "affectedRange": "<= 5.4.19",
+              "patchedVersion": "5.4.20",
+              "packageName": "vite"
+            },
+            {
+              "ghsaId": "GHSA-jqfw-vq24-v9c3",
+              "severity": "LOW",
+              "summary": "Vite's `server.fs` settings were not applied to HTML files",
+              "affectedRange": ">= 6.0.0, <= 6.3.5",
+              "patchedVersion": "6.3.6",
+              "packageName": "vite"
+            },
+            {
+              "ghsaId": "GHSA-jqfw-vq24-v9c3",
+              "severity": "LOW",
+              "summary": "Vite's `server.fs` settings were not applied to HTML files",
+              "affectedRange": ">= 7.0.0, <= 7.0.6",
+              "patchedVersion": "7.0.7",
+              "packageName": "vite"
+            },
+            {
+              "ghsaId": "GHSA-jqfw-vq24-v9c3",
+              "severity": "LOW",
+              "summary": "Vite's `server.fs` settings were not applied to HTML files",
+              "affectedRange": ">= 7.1.0, <= 7.1.4",
+              "patchedVersion": "7.1.5",
+              "packageName": "vite"
+            },
+            {
+              "ghsaId": "GHSA-859w-5945-r5v3",
+              "severity": "MODERATE",
+              "summary": "Vite's server.fs.deny bypassed with /. for files under project root",
+              "affectedRange": "<= 4.5.13",
+              "patchedVersion": "4.5.14",
+              "packageName": "vite"
+            },
+            {
+              "ghsaId": "GHSA-859w-5945-r5v3",
+              "severity": "MODERATE",
+              "summary": "Vite's server.fs.deny bypassed with /. for files under project root",
+              "affectedRange": ">= 5.0.0, <= 5.4.18",
+              "patchedVersion": "5.4.19",
+              "packageName": "vite"
+            },
+            {
+              "ghsaId": "GHSA-859w-5945-r5v3",
+              "severity": "MODERATE",
+              "summary": "Vite's server.fs.deny bypassed with /. for files under project root",
+              "affectedRange": ">= 6.0.0, <= 6.1.5",
+              "patchedVersion": "6.1.6",
+              "packageName": "vite"
+            },
+            {
+              "ghsaId": "GHSA-859w-5945-r5v3",
+              "severity": "MODERATE",
+              "summary": "Vite's server.fs.deny bypassed with /. for files under project root",
+              "affectedRange": ">= 6.2.0, <= 6.2.6",
+              "patchedVersion": "6.2.7",
+              "packageName": "vite"
+            },
+            {
+              "ghsaId": "GHSA-859w-5945-r5v3",
+              "severity": "MODERATE",
+              "summary": "Vite's server.fs.deny bypassed with /. for files under project root",
+              "affectedRange": ">= 6.3.0, <= 6.3.3",
+              "patchedVersion": "6.3.4",
+              "packageName": "vite"
+            }
+          ]
+        }
+      ],
+      "pr": null
+    }
+  ]
+}
