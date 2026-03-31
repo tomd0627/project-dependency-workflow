@@ -100,6 +100,27 @@ export async function detectTestCommand(repoPath) {
 }
 
 /**
+ * Checks whether a Node.js repository has a build script and returns the
+ * command to run it. Returns null if no build script is defined.
+ *
+ * @param {string} repoPath - Local path to the repository
+ * @returns {Promise<string | null>}
+ */
+export async function detectBuildCommand(repoPath) {
+  try {
+    const raw = await readFile(join(repoPath, "package.json"), "utf8");
+    const pkg = JSON.parse(raw);
+    if (pkg.scripts?.build) {
+      logger.debug({ repoPath }, "Detected npm build script");
+      return "npm run build";
+    }
+  } catch {
+    // No package.json or parse error — no build step.
+  }
+  return null;
+}
+
+/**
  * Runs the test suite and returns a structured result.
  * Always resolves — a test failure is not a thrown error but a `passed: false` result.
  * A timeout or execution error is also returned as `passed: false`.

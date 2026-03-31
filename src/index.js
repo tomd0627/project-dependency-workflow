@@ -33,7 +33,7 @@ import { waitForApproval } from "./gate.js";
 import { logger } from "./logger.js";
 import { createReportIssue, sendWebhookNotification } from "./notifier.js";
 import { createUpdateBranch, openPullRequest } from "./publisher.js";
-import { detectTestCommand, runTestSuite } from "./qa.js";
+import { detectBuildCommand, detectTestCommand, runTestSuite } from "./qa.js";
 import { scanRepository } from "./scanner.js";
 import { applyUpdates } from "./updater.js";
 
@@ -329,6 +329,23 @@ async function processEcosystem({ octokit, client, token, owner, repo, scanResul
         }
       } else {
         logger.info({ owner, repo, ecosystem }, "No test runner detected — skipping QA");
+      }
+
+      // BUILD — run after tests so a broken build blocks the PR even when
+      // there are no tests (e.g. Vite/React repos with only a build step).
+      if (!qaFailed) {
+        const buildCommand = await detectBuildCommand(cloneDir);
+        if (buildCommand) {
+          logger.info({ owner, repo, ecosystem, stage: STAGE.QA }, "Running build step");
+          const buildResult = await runTestSuite({ repoPath: cloneDir, command: buildCommand });
+          if (!buildResult.passed) {
+            logger.warn(
+              { owner, repo, ecosystem },
+              "Build failed after dependency update — skipping PR for this cycle"
+            );
+            qaFailed = true;
+          }
+        }
       }
 
       if (!qaFailed) {

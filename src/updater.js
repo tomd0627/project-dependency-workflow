@@ -5,6 +5,8 @@
  */
 
 import { exec as cpExec } from "node:child_process";
+import { writeFile } from "node:fs/promises";
+import { join } from "node:path";
 import { promisify } from "node:util";
 import { ECOSYSTEM } from "./constants.js";
 import { logger } from "./logger.js";
@@ -56,6 +58,9 @@ export async function updateNodeDependencies({ repoPath, packages }) {
       { repoPath, packages: args },
       "npm install failed with ERESOLVE peer conflict — retrying with --legacy-peer-deps"
     );
+    // Write .npmrc so any subsequent fresh install (e.g. Netlify CI) uses the
+    // same resolution strategy and doesn't fail on the same peer conflict.
+    await writeFile(join(repoPath, ".npmrc"), "legacy-peer-deps=true\n", "utf8");
     ({ stdout, stderr } = await exec(
       `npm install --legacy-peer-deps ${args.join(" ")}`,
       { cwd: repoPath }
