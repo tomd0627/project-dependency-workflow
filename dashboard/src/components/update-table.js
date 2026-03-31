@@ -219,7 +219,11 @@ export function renderUpdateTable(root, updates) {
 
     table.appendChild(thead);
     table.appendChild(tbody);
-    root.appendChild(table);
+
+    const scroll = document.createElement("div");
+    scroll.className = "table-scroll";
+    scroll.appendChild(table);
+    root.appendChild(scroll);
 
     if (totalPages > 1) {
       root.appendChild(
