@@ -32,7 +32,7 @@ function createUpdateRow(update) {
   // Package name
   const tdName = document.createElement("td");
   tdName.className = "update-table__cell update-table__cell--name";
-  tdName.textContent = update.name;
+  tdName.textContent = update.packageName ?? update.name;
 
   // Repository
   const tdRepo = document.createElement("td");
@@ -85,7 +85,7 @@ function createUpdateRow(update) {
   recWrapper.className = `rec-badge rec-badge--${recStatus}`;
   recWrapper.appendChild(createStatusIcon(recStatus, { size: 14 }));
   recWrapper.appendChild(
-    document.createTextNode(` ${formatRecommendation(update.recommendation)}`)
+    document.createTextNode(` ${formatRecommendation(update.recommendation)}`),
   );
   tdRec.appendChild(recWrapper);
 
@@ -103,16 +103,68 @@ function createUpdateRow(update) {
     tdCve.textContent = "—";
   }
 
-  for (const td of [tdName, tdRepo, tdEco, tdVersion, tdType, tdRisk, tdRec, tdCve]) {
+  for (const td of [
+    tdName,
+    tdRepo,
+    tdEco,
+    tdVersion,
+    tdType,
+    tdRisk,
+    tdRec,
+    tdCve,
+  ]) {
     tr.appendChild(td);
   }
 
   return tr;
 }
 
+const PAGE_SIZE = 20;
+
+/**
+ * Creates a pagination control bar.
+ * @param {number} page - Current zero-based page index
+ * @param {number} totalPages
+ * @param {number} totalItems
+ * @param {(p: number) => void} onPage
+ * @returns {HTMLElement}
+ */
+function createPagination(page, totalPages, totalItems, onPage) {
+  const bar = document.createElement("div");
+  bar.className = "pagination";
+  bar.setAttribute("role", "navigation");
+  bar.setAttribute("aria-label", "Table pagination");
+
+  const info = document.createElement("span");
+  info.className = "pagination__info";
+  const start = page * PAGE_SIZE + 1;
+  const end = Math.min((page + 1) * PAGE_SIZE, totalItems);
+  info.textContent = `${start}–${end} of ${totalItems}`;
+
+  const prevBtn = document.createElement("button");
+  prevBtn.className = "pagination__btn";
+  prevBtn.textContent = "← Prev";
+  prevBtn.disabled = page === 0;
+  prevBtn.setAttribute("aria-label", "Previous page");
+  prevBtn.addEventListener("click", () => onPage(page - 1));
+
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "pagination__btn";
+  nextBtn.textContent = "Next →";
+  nextBtn.disabled = page >= totalPages - 1;
+  nextBtn.setAttribute("aria-label", "Next page");
+  nextBtn.addEventListener("click", () => onPage(page + 1));
+
+  bar.appendChild(info);
+  bar.appendChild(prevBtn);
+  bar.appendChild(nextBtn);
+  return bar;
+}
+
 /**
  * Renders the update table into a container element.
  * Updates are pre-sorted by risk score, highest first.
+ * Tables with more than PAGE_SIZE rows are paginated.
  *
  * @param {HTMLElement} root - Container element to render into
  * @param {Array} updates - Flat array of update objects (may include repoName/ecosystem)
@@ -128,28 +180,53 @@ export function renderUpdateTable(root, updates) {
     return;
   }
 
-  const table = document.createElement("table");
-  table.className = "update-table";
-  table.setAttribute("aria-label", "Dependency updates");
+  const sorted = sortUpdatesByRisk(updates);
+  const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
 
-  const thead = document.createElement("thead");
-  const headerRow = document.createElement("tr");
-  const headers = ["Package", "Repository", "Ecosystem", "Version", "Type", "Risk", "Rec.", "CVE"];
-  for (const h of headers) {
-    const th = document.createElement("th");
-    th.className = "update-table__th";
-    th.scope = "col";
-    th.textContent = h;
-    headerRow.appendChild(th);
+  function renderPage(page) {
+    root.innerHTML = "";
+
+    const table = document.createElement("table");
+    table.className = "update-table";
+    table.setAttribute("aria-label", "Dependency updates");
+
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    const headers = [
+      "Package",
+      "Repository",
+      "Ecosystem",
+      "Version",
+      "Type",
+      "Risk",
+      "Rec.",
+      "CVE",
+    ];
+    for (const h of headers) {
+      const th = document.createElement("th");
+      th.className = "update-table__th";
+      th.scope = "col";
+      th.textContent = h;
+      headerRow.appendChild(th);
+    }
+    thead.appendChild(headerRow);
+
+    const tbody = document.createElement("tbody");
+    const pageItems = sorted.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+    for (const update of pageItems) {
+      tbody.appendChild(createUpdateRow(update));
+    }
+
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    root.appendChild(table);
+
+    if (totalPages > 1) {
+      root.appendChild(
+        createPagination(page, totalPages, sorted.length, renderPage),
+      );
+    }
   }
-  thead.appendChild(headerRow);
 
-  const tbody = document.createElement("tbody");
-  for (const update of sortUpdatesByRisk(updates)) {
-    tbody.appendChild(createUpdateRow(update));
-  }
-
-  table.appendChild(thead);
-  table.appendChild(tbody);
-  root.appendChild(table);
+  renderPage(0);
 }
