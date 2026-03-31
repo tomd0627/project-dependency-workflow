@@ -100,6 +100,33 @@ async function cloneRepo(token, owner, repo) {
 }
 
 /**
+ * Checks out the update branch, commits all changes, and pushes to origin.
+ * Called after applyUpdates (and optionally after autofixRegressions) so the
+ * branch has commits before openPullRequest is called.
+ *
+ * @param {string} dir - Local clone directory
+ * @param {string} branch - Remote branch name to push to
+ * @param {string} token - GitHub token (used in the remote URL)
+ * @param {string} owner
+ * @param {string} repo
+ * @param {string[]} packageSpecs - e.g. ["lodash@4.17.21"] for the commit message
+ * @returns {Promise<void>}
+ */
+async function commitAndPush(dir, branch, token, owner, repo, packageSpecs) {
+  const remote = `https://x-access-token:${token}@github.com/${owner}/${repo}.git`;
+  const message = `deps: update ${packageSpecs.join(", ")}`;
+
+  await exec(`git -C "${dir}" config user.email "dep-bot@users.noreply.github.com"`);
+  await exec(`git -C "${dir}" config user.name "Dep Bot"`);
+  await exec(`git -C "${dir}" checkout -b "${branch}"`);
+  await exec(`git -C "${dir}" add -A`);
+  await exec(`git -C "${dir}" commit -m "${message}"`);
+  await exec(`git -C "${dir}" push "${remote}" "${branch}"`);
+
+  logger.info({ owner, repo, branch }, "Changes committed and pushed");
+}
+
+/**
  * Removes a temporary directory created by cloneRepo.
  *
  * @param {string} dir
@@ -301,6 +328,11 @@ async function processEcosystem({ octokit, client, token, owner, repo, scanResul
         }
       } else {
         logger.info({ owner, repo, ecosystem }, "No test runner detected — skipping QA");
+      }
+
+      if (!qaFailed) {
+        const packageSpecs = packages.map((p) => `${p.name}@${p.version}`);
+        await commitAndPush(cloneDir, branch, token, owner, repo, packageSpecs);
       }
     } catch (err) {
       logger.error(
