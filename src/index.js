@@ -223,7 +223,7 @@ async function processEcosystem({ octokit, client, token, owner, repo, scanResul
     repo,
     scannedAt: new Date().toISOString(),
     results: analysisResults,
-    notifyUser: config.github_username || undefined,
+    notifyUser: process.env.NOTIFY_USERNAME || config.github_username || undefined,
   };
 
   const issueResult = await createReportIssue({ octokit, owner, repo, report, dryRun });

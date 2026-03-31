@@ -44,6 +44,7 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          NOTIFY_USERNAME: ${{ vars.NOTIFY_USERNAME }}
           TARGET_REPO: ${{ inputs.target_repo }}
           DRY_RUN: ${{ inputs.dry_run }}
         run: node src/index.js
