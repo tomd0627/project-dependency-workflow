@@ -47,8 +47,15 @@ const exec = promisify(cpExec);
  * @returns {Promise<object>}
  */
 async function loadConfig() {
-  const raw = await readFile(new URL("../bot.config.json", import.meta.url), "utf8");
-  return JSON.parse(raw);
+  const configUrl = new URL("../bot.config.json", import.meta.url);
+  const exampleUrl = new URL("../bot.config.example.json", import.meta.url);
+  try {
+    return JSON.parse(await readFile(configUrl, "utf8"));
+  } catch (err) {
+    if (err.code !== "ENOENT") throw err;
+    logger.warn("bot.config.json not found, falling back to bot.config.example.json");
+    return JSON.parse(await readFile(exampleUrl, "utf8"));
+  }
 }
 
 // ── Gate decision ──────────────────────────────────────────────────────────────
