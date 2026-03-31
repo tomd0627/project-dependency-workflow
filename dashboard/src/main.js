@@ -6,8 +6,11 @@
 import { createRepoCard } from "./components/repo-card.js";
 import { renderSidebar } from "./components/sidebar.js";
 import { renderUpdateTable } from "./components/update-table.js";
-import { runReport } from "./fixtures/run-report.js";
+import { runReport as fixtureReport } from "./fixtures/run-report.js";
 import { flattenUpdates } from "./utils.js";
+
+// Populated at bootstrap — either live data from /run-report.json or the fixture.
+let runReport = fixtureReport;
 
 const sidebarRoot = /** @type {HTMLElement} */ (document.getElementById("sidebar-root"));
 const appRoot = /** @type {HTMLElement} */ (document.getElementById("app-root"));
@@ -213,5 +216,26 @@ function navigate(id) {
   else if (id === "advisories") renderAdvisoriesSection();
 }
 
-// Bootstrap
-navigate("overview");
+// ── Bootstrap ────────────────────────────────────────────────────────────────
+
+/**
+ * Fetches the live run report from /run-report.json.
+ * Falls back to the fixture silently if the file is absent (local dev, first run).
+ */
+async function bootstrap() {
+  try {
+    const res = await fetch("/run-report.json");
+    if (res.ok) {
+      const data = await res.json();
+      // Only use live data if it has actual repositories.
+      if (Array.isArray(data.repositories) && data.repositories.length > 0) {
+        runReport = data;
+      }
+    }
+  } catch {
+    // Network error or missing file — fixture data is already in place.
+  }
+  navigate("overview");
+}
+
+bootstrap();

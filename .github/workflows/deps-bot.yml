@@ -47,3 +47,25 @@ jobs:
           TARGET_REPO: ${{ inputs.target_repo }}
           DRY_RUN: ${{ inputs.dry_run }}
         run: node src/index.js
+
+      - name: Commit run report for dashboard
+        if: ${{ inputs.dry_run != 'true' }}
+        run: |
+          if [ -f ".cache/run-report.json" ]; then
+            mkdir -p dashboard/public
+            cp .cache/run-report.json dashboard/public/run-report.json
+            git config user.name "Dep Bot"
+            git config user.email "dep-bot@users.noreply.github.com"
+            git add dashboard/public/run-report.json
+            git diff --staged --quiet || git commit -m "chore: update dashboard run report [skip ci]"
+            git push
+          fi
+
+      - name: Trigger Netlify dashboard rebuild
+        if: ${{ inputs.dry_run != 'true' }}
+        env:
+          NETLIFY_BUILD_HOOK: ${{ secrets.NETLIFY_BUILD_HOOK }}
+        run: |
+          if [ -n "$NETLIFY_BUILD_HOOK" ]; then
+            curl -s -X POST "$NETLIFY_BUILD_HOOK"
+          fi
