@@ -61,7 +61,7 @@ export function renderSidebar(root, report, { activeId = "overview", onNav } = {
   // ── Brand ──────────────────────────────────────────────────────────────────
   const brand = document.createElement("div");
   brand.className = "sidebar__brand";
-  brand.innerHTML = `<span class="sidebar__logo" aria-hidden="true">⚡</span>
+  brand.innerHTML = `<svg class="sidebar__logo" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
     <span class="sidebar__title">Dep Bot</span>`;
 
   // ── Navigation ─────────────────────────────────────────────────────────────

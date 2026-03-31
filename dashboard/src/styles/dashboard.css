@@ -14,8 +14,8 @@
 }
 
 .sidebar__logo {
-  font-size: var(--font-size-2xl);
-  line-height: 1;
+  flex-shrink: 0;
+  color: var(--color-accent-primary);
 }
 
 .sidebar__title {
