@@ -364,6 +364,16 @@ async function processEcosystem({ octokit, client, token, owner, repo, scanResul
   }
 
   if (qaFailed) {
+    if (issueResult && !dryRun) {
+      await octokit.rest.issues.createComment({
+        owner,
+        repo,
+        issue_number: issueResult.issueNumber,
+        body: "⚠️ **Build/test failed after applying updates — PR skipped for this cycle.**\n\nThe dependency update was applied locally but the build or test suite did not pass. No PR has been opened. Review the [Actions log](../../actions) for details, then re-run the bot once the issue is resolved.",
+      }).catch((err) => {
+        logger.warn({ owner, repo, error: err.message }, "Failed to post QA failure comment on issue");
+      });
+    }
     return { name: `${owner}/${repo}`, ecosystem, updates: enrichedUpdates, pr: null };
   }
 
