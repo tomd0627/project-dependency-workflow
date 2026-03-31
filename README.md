@@ -4,7 +4,7 @@
 > repositories on a schedule, analyzes available updates using Claude, scores them
 > for risk, notifies the owner, and — upon approval — applies changes, runs QA,
 > auto-fixes regressions, and opens a pull request. Built as a portfolio-grade project
-> demonstrating senior-level front-end engineering, API integration, and system design.
+> demonstrating senior-level software engineering, Claude API integration, and system design.
 
 ---
 
@@ -27,9 +27,9 @@ flowchart TD
     J -- Pass --> K[PUSH\nOpen PR with structured summary]
     J -- Fail --> L[AUTOFIX\nClaude fix loop × 3]
     L -- Fixed --> K
-    L -- Failed → restore --> K
+    L -- Failed --> Z2[Skip — log failure]
     K --> M[ROLLBACK\nPoll CI 30 min post-merge]
-    M -- CI fail --> N[Open revert PR or post revert command]
+    M -- CI fail --> N[Post revert instructions on PR\nOpen tracking issue]
     M -- CI pass --> O[Done]
 ```
 
@@ -40,7 +40,7 @@ flowchart TD
 ### Prerequisites
 
 - Node.js ≥ 20.0.0
-- A GitHub account with a personal access token (or use GitHub Actions GITHUB_TOKEN)
+- A GitHub account with a personal access token (or use GitHub Actions `GITHUB_TOKEN`)
 - An Anthropic API key
 
 ### Steps
@@ -84,15 +84,15 @@ flowchart TD
 
 ## Environment Variables
 
-| Variable | Required | Description | Example |
-|---|---|---|---|
-| `GITHUB_TOKEN` | Yes | GitHub PAT or Actions token. Needs `repo`, `issues`, and `pull-requests` write. | `ghp_abc123` |
-| `ANTHROPIC_API_KEY` | Yes | Anthropic API key for Claude analysis. | `sk-ant-...` |
-| `DISCORD_WEBHOOK` | No | Discord webhook URL for push notifications. | `https://discord.com/api/webhooks/...` |
-| `NTFY_TOPIC` | No | ntfy.sh topic name for push notifications. | `my-dep-bot-alerts` |
-| `TARGET_REPO` | No | Limit run to a single repository by name or full name. | `my-repo` or `username/my-repo` |
-| `DRY_RUN` | No | Set to `"true"` to run without making changes. Overrides `bot.config.json`. | `"true"` |
-| `LOG_LEVEL` | No | Pino log level. Defaults to `"info"`. | `"debug"` |
+| Variable | Required | Description |
+|---|---|---|
+| `GITHUB_TOKEN` | Yes | GitHub PAT or Actions token. Needs `repo`, `issues`, and `pull-requests` write. |
+| `ANTHROPIC_API_KEY` | Yes | Anthropic API key for Claude analysis. |
+| `DISCORD_WEBHOOK` | No | Full Discord webhook URL for push notifications. Takes precedence over `notification_webhook` in config. |
+| `NTFY_TOPIC` | No | ntfy.sh topic name for push notifications. |
+| `TARGET_REPO` | No | Limit run to a single repository by name or full name (e.g. `my-repo` or `username/my-repo`). |
+| `DRY_RUN` | No | Set to `"true"` to run without making any changes. Overrides `bot.config.json`. |
+| `LOG_LEVEL` | No | Pino log level. Defaults to `"info"`. |
 
 ---
 
@@ -100,20 +100,41 @@ flowchart TD
 
 | Key | Type | Default | Description |
 |---|---|---|---|
-| `schedule` | string | `"0 8 * * 1"` | Cron schedule for GitHub Actions. |
-| `github_username` | string | `""` | Your GitHub username. Used to scope repo discovery. |
-| `excluded_repos` | string[] | `[]` | Repo names to skip entirely. |
-| `priority_repos` | string[] | `[]` | Repos to process first in each run. |
-| `notification_webhook` | string | `""` | Discord or ntfy.sh webhook URL (same as env var). |
-| `approval_timeout_hours` | number | `48` | Hours to wait for approval before skipping a major update. |
-| `minor_auto_approve_delay_hours` | number | `6` | Hours to wait before auto-approving a minor update. |
-| `max_autofix_attempts` | number | `3` | Maximum Claude-powered autofix iterations per failure. |
-| `auto_approve_patch` | boolean | `true` | Auto-approve patch updates with risk ≤ 30. |
-| `auto_approve_minor` | boolean | `true` | Auto-approve minor updates with risk ≤ 50. |
+| `schedule` | string | `"0 8 * * 1"` | Cron schedule for the GitHub Actions workflow. |
+| `github_username` | string | `""` | Your GitHub username. Used to scope repository discovery. |
+| `excluded_repos` | string[] | `[]` | Repository names to skip entirely. |
+| `priority_repos` | string[] | `[]` | Repositories to process first in each run. |
+| `notification_webhook` | string | `""` | Discord webhook URL fallback (overridden by `DISCORD_WEBHOOK` env var). |
+| `approval_timeout_hours` | number | `48` | Hours to wait for an approval comment before skipping a gated update. |
+| `max_autofix_attempts` | number | `3` | Maximum Claude-powered autofix iterations per test failure. |
+| `auto_approve_patch` | boolean | `true` | Auto-approve patch updates below the risk threshold. |
+| `auto_approve_minor` | boolean | `true` | Auto-approve minor updates below the risk threshold. |
 | `auto_approve_major` | boolean | `false` | Auto-approve major updates (not recommended). |
-| `risk_threshold_auto_approve` | number | `50` | Risk scores above this always require manual approval. |
-| `dry_run` | boolean | `false` | Run full pipeline without applying any changes. |
+| `risk_threshold_auto_approve` | number | `50` | Risk scores above this always require manual approval via the gate. |
+| `dry_run` | boolean | `false` | Run the full pipeline without applying any changes. |
 | `cache_ttl_hours` | number | `24` | How long changelog analysis results are cached. |
+
+---
+
+## Dashboard
+
+The project includes a read-only SPA dashboard that visualises the most recent pipeline run.
+
+```bash
+# Development server (live reload)
+npm run dashboard:dev
+
+# Production build → dist/
+npm run dashboard:build
+
+# Preview the production build
+npm run dashboard:preview
+```
+
+After a pipeline run, `.cache/run-report.json` is written automatically. The dashboard
+reads this file to display repository status, risk scores, advisory badges, and PR links.
+The dashboard uses static fixture data when no run report is present, so it works
+immediately after cloning without needing a live GitHub token.
 
 ---
 
@@ -139,7 +160,7 @@ transparent, inspectable alternative that shows its reasoning at every step.
 
 This bot runs as a transient GitHub Actions job. A Redis instance would require
 always-on infrastructure, adding cost and operational overhead that exceeds the
-value for a single-user tool. A JSON file checked into `.cache/` (gitignored) is
+value for a single-user tool. A JSON file in `.cache/` (gitignored) is
 zero-infrastructure, immediately inspectable with any editor, and sufficient for
 the access patterns here (keyed reads/writes, per-package granularity, 24hr TTL).
 
@@ -149,24 +170,34 @@ The gate is designed around the cognitive model of "interrupt only when necessar
 Patch updates are invisible — they just happen. Minor updates run overnight and
 appear as a PR the next morning. Only major bumps (or anything Claude flags as
 high-risk) interrupt the owner's workflow with an issue that requires a response.
-This mirrors how experienced engineers mentally categorize dependency updates,
+This mirrors how experienced engineers mentally categorise dependency updates,
 making the bot feel like a smart assistant rather than a noisy alarm system.
+
+### Why vanilla JS for the dashboard (vs. React/Vue)?
+
+The dashboard is intentionally framework-free. It is a read-only display layer
+over a single JSON file — adding a build-time framework would introduce more
+complexity than the problem warrants. Vanilla JS keeps the bundle tiny, the
+dependency surface minimal, and demonstrates that component architecture and
+clean separation of concerns do not require a framework to achieve.
 
 ---
 
 ## Known Limitations
 
 - **No private repo changelog access**: The GitHub Releases API only returns
-  changelog data for public repos. Private dependency changelogs fall back to
-  Claude analyzing version numbers alone, reducing analysis quality.
-- **npm only at MVP**: Scanner and updater initially support Node.js/npm only.
-  Python, Rust, Go, and Ruby support is added in Step 9.
+  changelog data for public repositories. Private dependency changelogs fall back
+  to Claude analysing version numbers alone, which reduces analysis quality.
+- **Node.js updates only in the automated branch/PR flow**: Scanner and auditor
+  support Node.js, Python, Rust, Go, and Ruby. However, `updater.js` currently
+  applies updates via `npm install` only. Non-Node ecosystems are scanned,
+  analysed, and reported, but the branch/update/QA/PR stages are skipped for them.
 - **No lock-file conflict resolution**: If a dependency update causes lock-file
-  conflicts, the autofix loop may not resolve them. The bot will surface the
-  failure but not guarantee a clean PR.
+  conflicts, the autofix loop may not resolve them. The bot surfaces the failure
+  but does not guarantee a clean PR.
 - **GitHub Actions rate limits**: The bot respects rate limits via exponential
-  backoff, but very large repositories (hundreds of outdated deps) may approach
-  GitHub's secondary rate limits during a single run.
+  backoff, but very large repositories (hundreds of outdated dependencies) may
+  approach GitHub's secondary rate limits during a single run.
 - **Dashboard is read-only**: The dashboard displays run history and scores but
   does not provide a UI for approving updates — that still happens via GitHub
   Issue comments, which is intentional (one authoritative approval surface).
