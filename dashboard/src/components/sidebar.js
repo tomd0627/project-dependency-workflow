@@ -54,7 +54,7 @@ function createNavIcon(d) {
  * @param {object} report - Full run report
  * @param {{ activeId?: string, onNav?: (id: string) => void }} [opts]
  */
-export function renderSidebar(root, report, { activeId = "overview", onNav } = {}) {
+export function renderSidebar(root, report, { activeId = "overview", onNav, onClose } = {}) {
   const summary = getRunSummary(report);
   root.innerHTML = "";
 
@@ -63,6 +63,16 @@ export function renderSidebar(root, report, { activeId = "overview", onNav } = {
   brand.className = "sidebar__brand";
   brand.innerHTML = `<svg class="sidebar__logo" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
     <span class="sidebar__title">Dep Bot</span>`;
+
+  if (onClose) {
+    const closeBtn = document.createElement("button");
+    closeBtn.type = "button";
+    closeBtn.className = "sidebar__close";
+    closeBtn.setAttribute("aria-label", "Close navigation");
+    closeBtn.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18L18 6M6 6l12 12"/></svg>`;
+    closeBtn.addEventListener("click", onClose);
+    brand.appendChild(closeBtn);
+  }
 
   // ── Navigation ─────────────────────────────────────────────────────────────
   const nav = document.createElement("nav");

@@ -3,7 +3,88 @@
    Depends on design tokens defined in tokens.css.
 ───────────────────────────────────────────────────────────────────────────── */
 
+/* ── Mobile header ───────────────────────────────────────────────────────── */
+
+.mobile-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-bg-surface);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.mobile-header__title {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent-primary);
+}
+
+.menu-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2);
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.menu-toggle:hover {
+  border-color: var(--color-accent-primary);
+  color: var(--color-accent-primary);
+}
+
+.menu-toggle__close-icon { display: none; }
+.menu-toggle--open .menu-toggle__open-icon { display: none; }
+.menu-toggle--open .menu-toggle__close-icon { display: block; }
+
+@media (min-width: 1024px) {
+  .mobile-header {
+    display: none;
+  }
+}
+
+/* ── Sidebar overlay (mobile) ────────────────────────────────────────────── */
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 100;
+}
+
+.sidebar-overlay--visible {
+  display: block;
+}
+
 /* ── Sidebar ─────────────────────────────────────────────────────────────── */
+
+@media (max-width: 1023px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100dvh;
+    width: var(--sidebar-width);
+    z-index: 200;
+    transform: translateX(-100%);
+    transition: transform var(--transition-base);
+    overflow-y: auto;
+  }
+
+  .sidebar--open {
+    transform: translateX(0);
+  }
+}
 
 .sidebar__brand {
   display: flex;
@@ -11,6 +92,30 @@
   gap: var(--space-2);
   padding: var(--space-6) var(--space-4);
   border-bottom: 1px solid var(--color-border);
+}
+
+.sidebar__close {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  padding: var(--space-1);
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--color-text-dim);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.sidebar__close:hover {
+  color: var(--color-text-primary);
+}
+
+@media (max-width: 1023px) {
+  .sidebar__close {
+    display: flex;
+  }
 }
 
 .sidebar__logo {
@@ -157,6 +262,33 @@ section + section {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: var(--space-4);
+}
+
+/* ── Repo grid footer ────────────────────────────────────────────────────── */
+
+.repo-grid__footer {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-2);
+}
+
+.view-all-btn {
+  padding: var(--space-2) var(--space-5);
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.view-all-btn:hover {
+  border-color: var(--color-accent-primary);
+  color: var(--color-accent-primary);
 }
 
 /* ── Repo card ───────────────────────────────────────────────────────────── */

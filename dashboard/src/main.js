@@ -7,7 +7,10 @@ import { createRepoCard } from "./components/repo-card.js";
 import { renderSidebar } from "./components/sidebar.js";
 import { renderUpdateTable } from "./components/update-table.js";
 import { runReport as fixtureReport } from "./fixtures/run-report.js";
-import { flattenUpdates } from "./utils.js";
+import { flattenUpdates, getRepoStats } from "./utils.js";
+
+/** Max repo cards shown on the Overview before the "Show all" button appears. */
+const OVERVIEW_REPO_LIMIT = 12;
 
 // Populated at bootstrap — either live data from /run-report.json or the fixture.
 let runReport = fixtureReport;
@@ -47,10 +50,34 @@ function renderOverview() {
   const grid = document.createElement("div");
   grid.className = "repo-grid";
 
-  for (const repo of runReport.repositories) {
-    grid.appendChild(
-      createRepoCard(repo, { onClick: (r) => renderRepoDetail(r) })
-    );
+  // Sort by max risk descending so the most critical repos surface first.
+  const sorted = [...runReport.repositories].sort(
+    (a, b) => getRepoStats(b).maxRisk - getRepoStats(a).maxRisk
+  );
+  const visible = sorted.slice(0, OVERVIEW_REPO_LIMIT);
+  const hidden = sorted.slice(OVERVIEW_REPO_LIMIT);
+
+  for (const repo of visible) {
+    grid.appendChild(createRepoCard(repo, { onClick: (r) => renderRepoDetail(r) }));
+  }
+
+  if (hidden.length > 0) {
+    const footer = document.createElement("div");
+    footer.className = "repo-grid__footer";
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "view-all-btn";
+    btn.textContent = `Show all ${runReport.repositories.length} repositories`;
+    btn.addEventListener("click", () => {
+      footer.remove();
+      for (const repo of hidden) {
+        grid.appendChild(createRepoCard(repo, { onClick: (r) => renderRepoDetail(r) }));
+      }
+    });
+
+    footer.appendChild(btn);
+    grid.appendChild(footer);
   }
 
   repoSection.appendChild(repoHeading);
@@ -202,6 +229,41 @@ function createSectionHeading(text, id) {
   return h2;
 }
 
+// ── Mobile navigation ─────────────────────────────────────────────────────────
+
+function openSidebarMenu() {
+  document.getElementById("sidebar")?.classList.add("sidebar--open");
+  document.getElementById("sidebar-overlay")?.classList.add("sidebar-overlay--visible");
+  const toggle = document.getElementById("menu-toggle");
+  if (toggle) {
+    toggle.classList.add("menu-toggle--open");
+    toggle.setAttribute("aria-expanded", "true");
+    toggle.setAttribute("aria-label", "Close navigation");
+  }
+  document.body.style.overflow = "hidden";
+}
+
+function closeSidebarMenu() {
+  document.getElementById("sidebar")?.classList.remove("sidebar--open");
+  document.getElementById("sidebar-overlay")?.classList.remove("sidebar-overlay--visible");
+  const toggle = document.getElementById("menu-toggle");
+  if (toggle) {
+    toggle.classList.remove("menu-toggle--open");
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-label", "Open navigation");
+  }
+  document.body.style.overflow = "";
+}
+
+function setupMobileNav() {
+  document.getElementById("menu-toggle")?.addEventListener("click", () => {
+    const isOpen = document.getElementById("sidebar")?.classList.contains("sidebar--open");
+    if (isOpen) closeSidebarMenu(); else openSidebarMenu();
+  });
+  document.getElementById("sidebar-overlay")?.addEventListener("click", closeSidebarMenu);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeSidebarMenu(); });
+}
+
 // ── Router ───────────────────────────────────────────────────────────────────
 
 /**
@@ -209,7 +271,8 @@ function createSectionHeading(text, id) {
  * @param {string} id - 'overview' | 'updates' | 'advisories'
  */
 function navigate(id) {
-  renderSidebar(sidebarRoot, runReport, { activeId: id, onNav: navigate });
+  closeSidebarMenu();
+  renderSidebar(sidebarRoot, runReport, { activeId: id, onNav: navigate, onClose: closeSidebarMenu });
 
   if (id === "overview") renderOverview();
   else if (id === "updates") renderUpdatesSection();
@@ -235,6 +298,7 @@ async function bootstrap() {
   } catch {
     // Network error or missing file — fixture data is already in place.
   }
+  setupMobileNav();
   navigate("overview");
 }
 
