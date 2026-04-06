@@ -41,6 +41,18 @@ export async function waitForApproval({
     return "skipped";
   }
 
+  // In CI (GitHub Actions) the job has a hard timeout far shorter than the
+  // approval window. Skip inline polling — the issue has already been created,
+  // so the owner can review it and re-trigger the bot via workflow_dispatch
+  // with target_repo once they've approved.
+  if (process.env.GITHUB_ACTIONS === "true") {
+    logger.info(
+      { issueNumber },
+      "Running in GitHub Actions — skipping inline approval poll. Re-trigger the bot after approving the issue."
+    );
+    return "timeout";
+  }
+
   const deadline = _deadlineMs ?? (Date.now() + timeoutHours * 3_600_000);
   logger.info(
     { owner, repo, issueNumber, timeoutHours },
