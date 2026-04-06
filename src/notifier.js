@@ -104,7 +104,9 @@ export function renderIssueBody(report) {
 // ── GitHub Issue ──────────────────────────────────────────────────────────────
 
 /**
- * Finds the most recent open dep-bot report issue for this repo, if any.
+ * Finds the most recent dep-bot report issue for this repo updated within the
+ * last 48 hours, regardless of open/closed state. This allows the approval gate
+ * to find issues that were closed by the owner immediately after approving.
  *
  * @param {object} params
  * @param {import('@octokit/rest').Octokit} params.octokit
@@ -116,17 +118,22 @@ async function findExistingReportIssue({ octokit, owner, repo }) {
   const { data: issues } = await octokit.rest.issues.listForRepo({
     owner,
     repo,
-    state: "open",
+    state: "all",
     labels: PR.LABELS.join(","),
+    sort: "updated",
+    direction: "desc",
     per_page: 10,
   });
 
-  const existing = issues.find((i) => i.title.startsWith(NOTIFIER.ISSUE_TITLE_PREFIX));
+  const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+  const existing = issues.find(
+    (i) => i.title.startsWith(NOTIFIER.ISSUE_TITLE_PREFIX) && i.updated_at >= cutoff
+  );
   if (!existing) return null;
 
   logger.info(
-    { owner, repo, issueNumber: existing.number },
-    "Found existing open dep-bot issue — reusing instead of creating a new one"
+    { owner, repo, issueNumber: existing.number, state: existing.state },
+    "Found recent dep-bot issue — reusing instead of creating a new one"
   );
   return { issueNumber: existing.number, issueUrl: existing.html_url };
 }

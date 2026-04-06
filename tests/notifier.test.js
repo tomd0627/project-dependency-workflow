@@ -180,11 +180,13 @@ describe("createReportIssue", () => {
     expect(call.title).toContain("2026-03-30");
   });
 
-  it("reuses an existing open dep-bot issue instead of creating a new one", async () => {
+  it("reuses a recent open dep-bot issue instead of creating a new one", async () => {
     const existing = {
       number: 99,
       html_url: "https://github.com/octokit/rest.js/issues/99",
       title: "deps: dependency update report — 2026-03-29",
+      state: "open",
+      updated_at: new Date().toISOString(),
     };
     const octokit = makeOctokit({ existingIssues: [existing] });
     const result = await createReportIssue({
@@ -201,7 +203,47 @@ describe("createReportIssue", () => {
     );
   });
 
-  it("creates a new issue when no existing open dep-bot issue is found", async () => {
+  it("reuses a recently closed dep-bot issue (approved-then-closed workflow)", async () => {
+    const existing = {
+      number: 77,
+      html_url: "https://github.com/octokit/rest.js/issues/77",
+      title: "deps: dependency update report — 2026-04-06",
+      state: "closed",
+      updated_at: new Date().toISOString(),
+    };
+    const octokit = makeOctokit({ existingIssues: [existing] });
+    const result = await createReportIssue({
+      octokit,
+      owner: "octokit",
+      repo: "rest.js",
+      report: makeReport(),
+      dryRun: false,
+    });
+    expect(result).toEqual({ issueNumber: 77, issueUrl: existing.html_url });
+    expect(octokit.rest.issues.create).not.toHaveBeenCalled();
+  });
+
+  it("creates a new issue when no dep-bot issue was updated in the last 48 hours", async () => {
+    const stale = {
+      number: 55,
+      html_url: "https://github.com/octokit/rest.js/issues/55",
+      title: "deps: dependency update report — 2026-03-28",
+      state: "closed",
+      updated_at: new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString(),
+    };
+    const octokit = makeOctokit({ existingIssues: [stale] });
+    await createReportIssue({
+      octokit,
+      owner: "octokit",
+      repo: "rest.js",
+      report: makeReport(),
+      dryRun: false,
+    });
+    expect(octokit.rest.issues.create).toHaveBeenCalledTimes(1);
+    expect(octokit.rest.issues.update).not.toHaveBeenCalled();
+  });
+
+  it("creates a new issue when no existing dep-bot issue is found", async () => {
     const octokit = makeOctokit({ existingIssues: [] });
     await createReportIssue({
       octokit,
