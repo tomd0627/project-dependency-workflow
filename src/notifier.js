@@ -104,7 +104,40 @@ export function renderIssueBody(report) {
 // ── GitHub Issue ──────────────────────────────────────────────────────────────
 
 /**
- * Creates a structured GitHub Issue containing the full dependency report.
+ * Finds the most recent open dep-bot report issue for this repo, if any.
+ *
+ * @param {object} params
+ * @param {import('@octokit/rest').Octokit} params.octokit
+ * @param {string} params.owner
+ * @param {string} params.repo
+ * @returns {Promise<{ issueNumber: number; issueUrl: string } | null>}
+ */
+async function findExistingReportIssue({ octokit, owner, repo }) {
+  const { data: issues } = await octokit.rest.issues.listForRepo({
+    owner,
+    repo,
+    state: "open",
+    labels: PR.LABELS.join(","),
+    per_page: 10,
+  });
+
+  const existing = issues.find((i) => i.title.startsWith(NOTIFIER.ISSUE_TITLE_PREFIX));
+  if (!existing) return null;
+
+  logger.info(
+    { owner, repo, issueNumber: existing.number },
+    "Found existing open dep-bot issue — reusing instead of creating a new one"
+  );
+  return { issueNumber: existing.number, issueUrl: existing.html_url };
+}
+
+/**
+ * Creates (or reuses) a structured GitHub Issue containing the full dependency
+ * report. If an open dep-bot issue already exists for this repo, its body is
+ * updated in-place and the same issue number is returned — this prevents the
+ * approval gate from losing track of prior APPROVE/SKIP comments when the bot
+ * is re-triggered.
+ *
  * Returns null in dry-run mode without making any API calls.
  *
  * @param {object} params
@@ -122,6 +155,20 @@ export async function createReportIssue({ octokit, owner, repo, report, dryRun }
   if (dryRun) {
     logger.info({ owner, repo, title }, `${DRY_RUN_PREFIX} Skipping issue creation`);
     return null;
+  }
+
+  // Reuse an existing open issue so APPROVE comments are preserved across re-triggers.
+  const existing = await findExistingReportIssue({ octokit, owner, repo });
+  if (existing) {
+    await octokit.rest.issues.update({
+      owner,
+      repo,
+      issue_number: existing.issueNumber,
+      title,
+      body,
+    });
+    logger.info({ owner, repo, issueNumber: existing.issueNumber }, "Updated existing dep-bot issue");
+    return existing;
   }
 
   logger.info({ owner, repo }, "Creating dependency report issue");

@@ -42,13 +42,31 @@ export async function waitForApproval({
   }
 
   // In CI (GitHub Actions) the job has a hard timeout far shorter than the
-  // approval window. Skip inline polling — the issue has already been created,
-  // so the owner can review it and re-trigger the bot via workflow_dispatch
-  // with target_repo once they've approved.
+  // approval window. Do a single one-shot check rather than a polling loop —
+  // if the issue was already approved (re-trigger after approval), proceed;
+  // otherwise bail and let the owner re-trigger after they've commented.
   if (process.env.GITHUB_ACTIONS === "true") {
+    const { data: comments } = await octokit.rest.issues.listComments({
+      owner,
+      repo,
+      issue_number: issueNumber,
+    });
+
+    for (const comment of comments) {
+      const body = (comment.body ?? "").trim().toUpperCase();
+      if (body.includes(GATE.APPROVE_KEYWORD)) {
+        logger.info({ issueNumber, author: comment.user?.login }, "Gate approved (CI one-shot check)");
+        return "approved";
+      }
+      if (body.includes(GATE.SKIP_KEYWORD)) {
+        logger.info({ issueNumber, author: comment.user?.login }, "Gate skipped (CI one-shot check)");
+        return "skipped";
+      }
+    }
+
     logger.info(
       { issueNumber },
-      "Running in GitHub Actions — skipping inline approval poll. Re-trigger the bot after approving the issue."
+      "Running in GitHub Actions — no approval found yet. Re-trigger the bot after approving the issue."
     );
     return "timeout";
   }

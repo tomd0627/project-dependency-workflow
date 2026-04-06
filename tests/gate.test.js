@@ -124,6 +124,58 @@ describe("waitForApproval — skip", () => {
   });
 });
 
+// ── GitHub Actions one-shot ───────────────────────────────────────────────────
+
+describe("waitForApproval — GitHub Actions one-shot", () => {
+  const originalEnv = process.env.GITHUB_ACTIONS;
+
+  beforeEach(() => {
+    process.env.GITHUB_ACTIONS = "true";
+  });
+
+  afterEach(() => {
+    if (originalEnv === undefined) {
+      delete process.env.GITHUB_ACTIONS;
+    } else {
+      process.env.GITHUB_ACTIONS = originalEnv;
+    }
+  });
+
+  it("returns 'approved' immediately when an APPROVE comment already exists", async () => {
+    const octokit = makeOctokit([makeComment("APPROVE")]);
+    const result = await waitForApproval({ ...BASE, octokit });
+    expect(result).toBe("approved");
+    expect(octokit.rest.issues.listComments).toHaveBeenCalledTimes(1);
+  });
+
+  it("returns 'skipped' immediately when a SKIP comment already exists", async () => {
+    const octokit = makeOctokit([makeComment("SKIP")]);
+    const result = await waitForApproval({ ...BASE, octokit });
+    expect(result).toBe("skipped");
+  });
+
+  it("returns 'timeout' when no approval comment is found (re-trigger needed)", async () => {
+    const octokit = makeOctokit([makeComment("lgtm")]);
+    const result = await waitForApproval({ ...BASE, octokit });
+    expect(result).toBe("timeout");
+    expect(octokit.rest.issues.listComments).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not enter the polling loop (only one listComments call)", async () => {
+    const octokit = makeOctokit([], [makeComment("APPROVE")]);
+    const result = await waitForApproval({ ...BASE, octokit });
+    // No second poll — result is timeout because first page had no decision
+    expect(result).toBe("timeout");
+    expect(octokit.rest.issues.listComments).toHaveBeenCalledTimes(1);
+  });
+
+  it("is case-insensitive (approve lowercase)", async () => {
+    const octokit = makeOctokit([makeComment("approve")]);
+    const result = await waitForApproval({ ...BASE, octokit });
+    expect(result).toBe("approved");
+  });
+});
+
 // ── edge cases ────────────────────────────────────────────────────────────────
 
 describe("waitForApproval — edge cases", () => {

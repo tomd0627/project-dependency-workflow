@@ -31,9 +31,24 @@ const makeReport = (overrides = {}) => ({
   ...overrides,
 });
 
-/** Creates a mock Octokit whose issues.create resolves/rejects on demand. */
-const makeOctokit = (issuesCreateImpl) => ({
-  rest: { issues: { create: jest.fn().mockImplementation(issuesCreateImpl) } },
+/**
+ * Creates a mock Octokit for createReportIssue tests.
+ *
+ * @param {object} opts
+ * @param {Function} [opts.createImpl] - impl for issues.create
+ * @param {Array}   [opts.existingIssues] - list returned by listForRepo (default: [])
+ */
+const makeOctokit = ({ createImpl, existingIssues = [] } = {}) => ({
+  rest: {
+    issues: {
+      listForRepo: jest.fn().mockResolvedValue({ data: existingIssues }),
+      create: jest.fn().mockImplementation(
+        createImpl ??
+          (() => Promise.resolve({ data: { number: 42, html_url: "https://github.com/octokit/rest.js/issues/42" } }))
+      ),
+      update: jest.fn().mockResolvedValue({}),
+    },
+  },
 });
 
 /** Creates a mock fetch response. */
@@ -108,9 +123,7 @@ describe("renderIssueBody", () => {
 
 describe("createReportIssue", () => {
   it("creates an issue and returns its number and URL", async () => {
-    const octokit = makeOctokit(() =>
-      Promise.resolve({ data: { number: 42, html_url: "https://github.com/octokit/rest.js/issues/42" } })
-    );
+    const octokit = makeOctokit();
     const result = await createReportIssue({
       octokit,
       owner: "octokit",
@@ -123,9 +136,9 @@ describe("createReportIssue", () => {
   });
 
   it("passes title, body, and labels to the API", async () => {
-    const octokit = makeOctokit(() =>
-      Promise.resolve({ data: { number: 1, html_url: "https://github.com/a/b/issues/1" } })
-    );
+    const octokit = makeOctokit({
+      createImpl: () => Promise.resolve({ data: { number: 1, html_url: "https://github.com/a/b/issues/1" } }),
+    });
     await createReportIssue({
       octokit,
       owner: "a",
@@ -140,7 +153,7 @@ describe("createReportIssue", () => {
   });
 
   it("returns null and skips the API call in dry-run mode", async () => {
-    const octokit = makeOctokit(() => Promise.resolve({ data: {} }));
+    const octokit = makeOctokit();
     const result = await createReportIssue({
       octokit,
       owner: "octokit",
@@ -153,9 +166,9 @@ describe("createReportIssue", () => {
   });
 
   it("includes the scan date in the issue title", async () => {
-    const octokit = makeOctokit(() =>
-      Promise.resolve({ data: { number: 7, html_url: "https://github.com/a/b/issues/7" } })
-    );
+    const octokit = makeOctokit({
+      createImpl: () => Promise.resolve({ data: { number: 7, html_url: "https://github.com/a/b/issues/7" } }),
+    });
     await createReportIssue({
       octokit,
       owner: "a",
@@ -165,6 +178,40 @@ describe("createReportIssue", () => {
     });
     const call = octokit.rest.issues.create.mock.calls[0][0];
     expect(call.title).toContain("2026-03-30");
+  });
+
+  it("reuses an existing open dep-bot issue instead of creating a new one", async () => {
+    const existing = {
+      number: 99,
+      html_url: "https://github.com/octokit/rest.js/issues/99",
+      title: "deps: dependency update report — 2026-03-29",
+    };
+    const octokit = makeOctokit({ existingIssues: [existing] });
+    const result = await createReportIssue({
+      octokit,
+      owner: "octokit",
+      repo: "rest.js",
+      report: makeReport(),
+      dryRun: false,
+    });
+    expect(result).toEqual({ issueNumber: 99, issueUrl: existing.html_url });
+    expect(octokit.rest.issues.create).not.toHaveBeenCalled();
+    expect(octokit.rest.issues.update).toHaveBeenCalledWith(
+      expect.objectContaining({ issue_number: 99 })
+    );
+  });
+
+  it("creates a new issue when no existing open dep-bot issue is found", async () => {
+    const octokit = makeOctokit({ existingIssues: [] });
+    await createReportIssue({
+      octokit,
+      owner: "octokit",
+      repo: "rest.js",
+      report: makeReport(),
+      dryRun: false,
+    });
+    expect(octokit.rest.issues.create).toHaveBeenCalledTimes(1);
+    expect(octokit.rest.issues.update).not.toHaveBeenCalled();
   });
 });
 
