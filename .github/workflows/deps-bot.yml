@@ -23,7 +23,7 @@ permissions:
 jobs:
   run-deps-bot:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 120
 
     steps:
       - name: Checkout repository
