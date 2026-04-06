@@ -77,6 +77,20 @@ export function formatRecommendation(rec) {
 }
 
 /**
+ * Formats a duration in seconds to a human-readable string.
+ * @param {number} totalSeconds
+ * @returns {string} e.g. "42 seconds", "1 min 23 sec", "2 min"
+ */
+export function formatDuration(totalSeconds) {
+  const s = Math.round(totalSeconds);
+  if (s < 60) return `${s} second${s === 1 ? "" : "s"}`;
+  const m = Math.floor(s / 60);
+  const rem = s % 60;
+  const mins = `${m} min`;
+  return rem === 0 ? mins : `${mins} ${rem} sec`;
+}
+
+/**
  * Formats an ISO date string as a human-readable relative-time string.
  * Falls back to a locale date string for dates older than 30 days.
  * @param {string} isoDate

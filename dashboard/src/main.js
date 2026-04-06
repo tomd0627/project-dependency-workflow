@@ -7,7 +7,7 @@ import { createRepoCard } from "./components/repo-card.js";
 import { renderSidebar } from "./components/sidebar.js";
 import { renderUpdateTable } from "./components/update-table.js";
 import { runReport as fixtureReport } from "./fixtures/run-report.js";
-import { flattenUpdates, getRepoStats } from "./utils.js";
+import { flattenUpdates, formatDuration, getRepoStats } from "./utils.js";
 
 /** Max repo cards shown on the Overview before the "Show all" button appears. */
 const OVERVIEW_REPO_LIMIT = 12;
@@ -39,7 +39,7 @@ function renderOverview() {
 
   const header = createPageHeader(
     "Overview",
-    `${runReport.repositories.length} repositories · ${runReport.durationSeconds}s pipeline run`
+    `${runReport.repositories.length} repositories · ${formatDuration(runReport.durationSeconds)} pipeline run`
   );
 
   // Repo grid
@@ -68,11 +68,26 @@ function renderOverview() {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "view-all-btn";
+
+    /** @type {HTMLElement[]} */
+    const hiddenCards = [];
+    let expanded = false;
+
     btn.textContent = `Show all ${runReport.repositories.length} repositories`;
     btn.addEventListener("click", () => {
-      footer.remove();
-      for (const repo of hidden) {
-        grid.appendChild(createRepoCard(repo, { onClick: (r) => renderRepoDetail(r) }));
+      if (!expanded) {
+        for (const repo of hidden) {
+          const card = createRepoCard(repo, { onClick: (r) => renderRepoDetail(r) });
+          hiddenCards.push(card);
+          grid.insertBefore(card, footer);
+        }
+        btn.textContent = "Show less";
+        expanded = true;
+      } else {
+        for (const card of hiddenCards) card.remove();
+        hiddenCards.length = 0;
+        btn.textContent = `Show all ${runReport.repositories.length} repositories`;
+        expanded = false;
       }
     });
 
