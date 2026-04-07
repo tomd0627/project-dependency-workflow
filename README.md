@@ -19,9 +19,9 @@ flowchart TD
     E --> F[NOTIFY\nOpen structured GitHub Issue]
     F --> G{GATE\nApproval required?}
     G -- Auto-approved --> H[BRANCH\nCreate deps/update-YYYY-MM-DD]
-    G -- Needs approval --> G2[Poll for APPROVE comment\n48hr timeout]
+    G -- Needs approval --> G2[GATE\nIssue created — comment APPROVE or SKIP\nApproval Watcher detects response every 30 min]
     G2 -- Approved --> H
-    G2 -- Timeout/Skip --> Z[Skip — log reason]
+    G2 -- Skipped --> Z[Skip — log reason]
     H --> I[UPDATE\nApply via package manager]
     I --> J[QA\nRun test suite]
     J -- Pass --> K[PUSH\nOpen PR with structured summary]
@@ -79,9 +79,11 @@ flowchart TD
    ```
 
 6. **Deploy to GitHub Actions**
-   Push the repository to GitHub. The workflow at `.github/workflows/deps-bot.yml`
-   will trigger automatically on Mondays at 08:00 UTC. Add the required secrets
-   in your repository settings.
+   Push the repository to GitHub. Two workflows will be active:
+   - `.github/workflows/deps-bot.yml` — full pipeline scan, triggers on Mondays at 08:00 UTC (or manually)
+   - `.github/workflows/approve-watcher.yml` — polls every 30 minutes for approved issues and creates PRs automatically
+
+   Add the required secrets in your repository settings.
 
 ---
 
@@ -177,6 +179,11 @@ appear as a PR the next morning. Only major bumps (or anything Claude flags as
 high-risk) interrupt the owner's workflow with an issue that requires a response.
 This mirrors how experienced engineers mentally categorise dependency updates,
 making the bot feel like a smart assistant rather than a noisy alarm system.
+
+The intended flow is: **comment `APPROVE` on the issue → a PR appears automatically
+within ~30 minutes**, handled by the Approval Watcher workflow. GitHub Actions jobs
+cannot block indefinitely waiting for human input, so the watcher runs on a separate
+30-minute schedule to bridge that gap — no manual re-trigger required.
 
 ### Why vanilla JS for the dashboard (vs. React/Vue)?
 

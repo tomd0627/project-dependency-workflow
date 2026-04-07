@@ -1,0 +1,63 @@
+name: Approval Watcher
+
+# Polls every 30 minutes for dep-bot issues that have been approved.
+# When an approved issue is found with no open PR, runs the full pipeline
+# for that repo to create the PR — completing the approve-to-PR flow
+# without requiring a manual re-trigger of the main bot.
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  watch-approvals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check for approved issues and create PRs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          NOTIFY_USERNAME: ${{ vars.NOTIFY_USERNAME }}
+        run: node src/approve-watcher.js
+
+      - name: Commit run report for dashboard
+        run: |
+          if [ -f ".cache/run-report.json" ]; then
+            mkdir -p dashboard/public
+            cp .cache/run-report.json dashboard/public/run-report.json
+            git config user.name "Dep Bot"
+            git config user.email "dep-bot@users.noreply.github.com"
+            git add dashboard/public/run-report.json
+            git diff --staged --quiet || git commit -m "chore: update dashboard run report [skip ci]"
+            git push
+          fi
+
+      - name: Trigger Netlify dashboard rebuild
+        env:
+          NETLIFY_BUILD_HOOK: ${{ secrets.NETLIFY_BUILD_HOOK }}
+        run: |
+          if [ -n "$NETLIFY_BUILD_HOOK" ]; then
+            curl -s -X POST "$NETLIFY_BUILD_HOOK"
+          fi
