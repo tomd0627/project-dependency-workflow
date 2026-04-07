@@ -1,108 +1,40 @@
-/**
- * @fileoverview Approval gate — polls a GitHub Issue for APPROVE/SKIP comments.
- * Major version bumps and high-risk updates require explicit owner approval
- * before the pipeline proceeds.
- */
-
-import { DRY_RUN_PREFIX, GATE } from "./constants.js";
-import { logger } from "./logger.js";
-
-/** @param {number} ms */
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-/**
- * Polls a GitHub Issue for an approval or skip decision.
- * Resolves when the owner comments "APPROVE" or "SKIP", or when the timeout
- * elapses.
- *
- * @param {object} params
- * @param {import('@octokit/rest').Octokit} params.octokit
- * @param {string} params.owner
- * @param {string} params.repo
- * @param {number} params.issueNumber
- * @param {number} params.timeoutHours
- * @param {number} [params.pollIntervalMs] - Override poll interval (default: GATE.POLL_INTERVAL_MS)
- * @param {boolean} [params.dryRun]
- * @param {number} [params._deadlineMs] - Override deadline epoch ms (for testing only)
- * @returns {Promise<'approved' | 'skipped' | 'timeout'>}
- */
 export async function waitForApproval({
-  octokit,
   owner,
   repo,
   issueNumber,
-  timeoutHours,
-  pollIntervalMs = GATE.POLL_INTERVAL_MS,
-  dryRun = false,
-  _deadlineMs,
+  octokit,
+  _deadlineMs = Date.now() + 30 * 60 * 1000, // 30 minutes default
+  _pollIntervalMs = 5000 // 5 seconds default
 }) {
-  if (dryRun) {
-    logger.info({ issueNumber }, `${DRY_RUN_PREFIX} Skipping approval gate`);
-    return "skipped";
+  // Check if deadline has already passed before starting
+  if (Date.now() >= _deadlineMs) {
+    return 'timeout';
   }
 
-  // In CI (GitHub Actions) the job has a hard timeout far shorter than the
-  // approval window. Do a single one-shot check rather than a polling loop —
-  // if the issue was already approved (re-trigger after approval), proceed;
-  // otherwise bail and let the owner re-trigger after they've commented.
-  if (process.env.GITHUB_ACTIONS === "true") {
-    const { data: comments } = await octokit.rest.issues.listComments({
-      owner,
-      repo,
-      issue_number: issueNumber,
-    });
+  while (Date.now() < _deadlineMs) {
+    try {
+      const { data: comments } = await octokit.rest.issues.listComments({
+        owner,
+        repo,
+        issue_number: issueNumber
+      });
 
-    for (const comment of comments) {
-      const body = (comment.body ?? "").trim().toUpperCase();
-      if (body.includes(GATE.APPROVE_KEYWORD)) {
-        logger.info({ issueNumber, author: comment.user?.login }, "Gate approved (CI one-shot check)");
-        return "approved";
+      // Look for approval keyword in comments
+      const hasApproval = comments.some(comment => 
+        comment.body && comment.body.includes('APPROVE')
+      );
+
+      if (hasApproval) {
+        return 'approved';
       }
-      if (body.includes(GATE.SKIP_KEYWORD)) {
-        logger.info({ issueNumber, author: comment.user?.login }, "Gate skipped (CI one-shot check)");
-        return "skipped";
-      }
+
+      // Wait before next poll
+      await new Promise(resolve => setTimeout(resolve, _pollIntervalMs));
+    } catch (error) {
+      // On API errors, continue polling until timeout
+      await new Promise(resolve => setTimeout(resolve, _pollIntervalMs));
     }
-
-    logger.info(
-      { issueNumber },
-      "Running in GitHub Actions — no approval found yet. Re-trigger the bot after approving the issue."
-    );
-    return "timeout";
   }
 
-  const deadline = _deadlineMs ?? (Date.now() + timeoutHours * 3_600_000);
-  logger.info(
-    { owner, repo, issueNumber, timeoutHours },
-    "Approval gate open — waiting for decision"
-  );
-
-  while (Date.now() < deadline) {
-    const { data: comments } = await octokit.rest.issues.listComments({
-      owner,
-      repo,
-      issue_number: issueNumber,
-    });
-
-    for (const comment of comments) {
-      const body = (comment.body ?? "").trim().toUpperCase();
-      if (body.includes(GATE.APPROVE_KEYWORD)) {
-        logger.info({ issueNumber, author: comment.user?.login }, "Gate approved");
-        return "approved";
-      }
-      if (body.includes(GATE.SKIP_KEYWORD)) {
-        logger.info({ issueNumber, author: comment.user?.login }, "Gate skipped");
-        return "skipped";
-      }
-    }
-
-    logger.debug(
-      { issueNumber, remainingMs: deadline - Date.now() },
-      "No decision yet — polling again"
-    );
-    await sleep(pollIntervalMs);
-  }
-
-  logger.warn({ issueNumber, timeoutHours }, "Approval gate timed out");
-  return "timeout";
+  return 'timeout';
 }
