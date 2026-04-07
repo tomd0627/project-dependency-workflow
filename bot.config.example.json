@@ -14,5 +14,6 @@
   "dry_run": false,
   "cache_ttl_hours": 24,
   "scan_ecosystems": null,
-  "repo_concurrency": 3
+  "repo_concurrency": 3,
+  "held_packages": {}
 }

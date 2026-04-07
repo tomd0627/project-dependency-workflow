@@ -27,13 +27,25 @@ const riskBand = (score) => {
  *
  * @param {DependencyReport} report
  * @param {boolean} hasSecurityFixes
+ * @param {boolean} [qaFailed] - When true, adds a build-failure warning (draft PR scenario)
  * @returns {string}
  */
-export function renderPrBody(report, hasSecurityFixes) {
+export function renderPrBody(report, hasSecurityFixes, qaFailed = false) {
   const lines = [
     `## Automated Dependency Updates`,
     "",
   ];
+
+  if (qaFailed) {
+    lines.push(
+      "> 🚧 **Build failed after applying these updates.**",
+      ">",
+      "> This PR was opened as a **draft** because the build or test suite did not pass after",
+      "> the dependency update was applied. The changes here are the raw version bumps only —",
+      "> you will need to address any breaking changes before marking this ready for review.",
+      ""
+    );
+  }
 
   if (hasSecurityFixes) {
     lines.push("> ⚠️ **This PR includes security-relevant updates.** Review breaking changes carefully.", "");
@@ -166,6 +178,8 @@ export async function deleteUpdateBranch({ octokit, owner, repo, branch, dryRun 
  * @param {string} params.branch - Head branch created by createUpdateBranch
  * @param {DependencyReport} params.report
  * @param {boolean} params.hasSecurityFixes
+ * @param {boolean} [params.draft] - When true, opens the PR as a draft (build-failure scenario)
+ * @param {boolean} [params.qaFailed] - Passed through to renderPrBody for the failure banner
  * @param {boolean} [params.dryRun]
  * @returns {Promise<{ prNumber: number; prUrl: string } | null>}
  */
@@ -176,18 +190,22 @@ export async function openPullRequest({
   branch,
   report,
   hasSecurityFixes,
+  draft = false,
+  qaFailed = false,
   dryRun = false,
 }) {
   const { defaultBranch } = await getDefaultBranchSha(octokit, owner, repo);
 
-  const title = hasSecurityFixes
-    ? `${PR.TITLE_PREFIX} (security)`
-    : PR.TITLE_PREFIX;
+  const title = draft
+    ? `${PR.TITLE_PREFIX} [build failed — needs manual fix]`
+    : hasSecurityFixes
+      ? `${PR.TITLE_PREFIX} (security)`
+      : PR.TITLE_PREFIX;
 
-  const body = renderPrBody(report, hasSecurityFixes);
+  const body = renderPrBody(report, hasSecurityFixes, qaFailed);
 
   if (dryRun) {
-    logger.info({ owner, repo, branch, title }, `${DRY_RUN_PREFIX} Skipping PR creation`);
+    logger.info({ owner, repo, branch, title, draft }, `${DRY_RUN_PREFIX} Skipping PR creation`);
     return null;
   }
 
@@ -199,9 +217,10 @@ export async function openPullRequest({
     head: branch,
     base: defaultBranch,
     labels: PR.LABELS,
+    draft,
   });
 
-  logger.info({ owner, repo, prNumber: data.number, prUrl: data.html_url }, "Pull request opened");
+  logger.info({ owner, repo, prNumber: data.number, prUrl: data.html_url, draft }, "Pull request opened");
 
   if (hasSecurityFixes) {
     await octokit.rest.issues.addLabels({

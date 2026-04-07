@@ -12,6 +12,7 @@
  * skipped — they cannot be compared against a registry.
  */
 
+import semver from "semver";
 import { CRATES, ECOSYSTEM, GO_PROXY, MANIFEST_FILE, NPM, PYPI, RUBYGEMS, UPDATE_TYPE } from "./constants.js";
 import { logger } from "./logger.js";
 
@@ -90,6 +91,43 @@ export function parsePackageJsonDependencies(rawJson) {
   }
 
   return result;
+}
+
+// ── Held-package filtering ────────────────────────────────────────────────────
+
+/**
+ * Removes packages from an outdated list whose latest version falls outside the
+ * caller-supplied semver range constraint. Used to temporarily hold back
+ * packages whose ecosystems haven't caught up with a major release (e.g.
+ * TypeScript 6 while eslint plugins are still incompatible).
+ *
+ * `heldPackages` maps package name → semver range string. A package is held
+ * (dropped from the list) when its `latest` version does NOT satisfy the range.
+ *
+ * @example
+ * // Hold TypeScript below v6, sass below 1.99:
+ * filterHeldPackages(outdated, { typescript: "< 6", sass: "< 1.99" })
+ *
+ * @param {OutdatedPackage[]} outdated
+ * @param {Record<string, string>} heldPackages - package name → semver range
+ * @returns {OutdatedPackage[]}
+ */
+export function filterHeldPackages(outdated, heldPackages) {
+  if (!heldPackages || Object.keys(heldPackages).length === 0) return outdated;
+
+  return outdated.filter((pkg) => {
+    const range = heldPackages[pkg.name];
+    if (!range) return true; // not held — include
+
+    const satisfies = semver.satisfies(pkg.latest, range, { includePrerelease: false });
+    if (!satisfies) {
+      logger.info(
+        { package: pkg.name, latest: pkg.latest, heldRange: range },
+        "Package held — latest version is outside allowed range"
+      );
+    }
+    return satisfies;
+  });
 }
 
 // ── GitHub Contents API ───────────────────────────────────────────────────────
@@ -633,9 +671,10 @@ export async function scanNodeEcosystem(octokit, owner, repo) {
  * @param {string} owner
  * @param {string} repo
  * @param {string[] | undefined} [allowedEcosystems] - If set, only probe for these ecosystems
+ * @param {Record<string, string>} [heldPackages] - Package-level semver hold constraints from config
  * @returns {Promise<ScanResult[]>}
  */
-export async function scanRepository(octokit, owner, repo, allowedEcosystems) {
+export async function scanRepository(octokit, owner, repo, allowedEcosystems, heldPackages = {}) {
   const ecosystems = await detectEcosystems(octokit, owner, repo, allowedEcosystems);
 
   if (ecosystems.length === 0) {
@@ -664,5 +703,8 @@ export async function scanRepository(octokit, owner, repo, allowedEcosystems) {
       }
       return true;
     })
-    .map((r) => /** @type {PromiseFulfilledResult<ScanResult>} */ (r).value);
+    .map((r) => {
+      const result = /** @type {PromiseFulfilledResult<ScanResult>} */ (r).value;
+      return { ...result, outdated: filterHeldPackages(result.outdated, heldPackages) };
+    });
 }

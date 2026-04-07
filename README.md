@@ -120,6 +120,7 @@ flowchart TD
 | `cache_ttl_hours` | number | `24` | How long changelog analysis results are cached. |
 | `scan_ecosystems` | string[] \| null | `null` | Limit ecosystem detection to specific ecosystems (e.g. `["node"]`). `null` checks all supported ecosystems. |
 | `repo_concurrency` | number | `3` | Number of repositories to process in parallel. Increase for large portfolios; decrease if hitting GitHub rate limits. |
+| `held_packages` | object | `{}` | Package-level version holds. Map of package name → semver range. Packages whose latest version falls outside the range are silently skipped until the hold is lifted. E.g. `{ "typescript": "< 6" }` holds TypeScript below v6. |
 
 ---
 

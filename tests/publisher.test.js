@@ -90,6 +90,17 @@ describe("renderPrBody", () => {
     expect(body).not.toContain("security-relevant");
   });
 
+  it("includes a build-failure warning when qaFailed is true", () => {
+    const body = renderPrBody(makeReport(), false, true);
+    expect(body).toContain("Build failed");
+    expect(body).toContain("draft");
+  });
+
+  it("omits the build-failure warning when qaFailed is false", () => {
+    const body = renderPrBody(makeReport(), false, false);
+    expect(body).not.toContain("Build failed");
+  });
+
   it("uses a green indicator for low-risk scores (≤30)", () => {
     const body = renderPrBody(makeReport({ results: [makeResult({ riskScore: 10 })] }), false);
     expect(body).toContain("🟢");
@@ -266,5 +277,40 @@ describe("openPullRequest", () => {
     });
     expect(result).toBeNull();
     expect(octokit.rest.pulls.create).not.toHaveBeenCalled();
+  });
+
+  it("passes draft:true to the API when draft is set", async () => {
+    const octokit = makeOctokit();
+    await openPullRequest({
+      octokit, owner: "org", repo: "repo",
+      branch: "deps/update-2026-03-30",
+      report: makeReport(), hasSecurityFixes: false,
+      draft: true,
+    });
+    const call = octokit.rest.pulls.create.mock.calls[0][0];
+    expect(call.draft).toBe(true);
+  });
+
+  it("includes 'build failed' in the title when draft is set", async () => {
+    const octokit = makeOctokit();
+    await openPullRequest({
+      octokit, owner: "org", repo: "repo",
+      branch: "deps/update-2026-03-30",
+      report: makeReport(), hasSecurityFixes: false,
+      draft: true,
+    });
+    const call = octokit.rest.pulls.create.mock.calls[0][0];
+    expect(call.title).toContain("build failed");
+  });
+
+  it("passes draft:false by default", async () => {
+    const octokit = makeOctokit();
+    await openPullRequest({
+      octokit, owner: "org", repo: "repo",
+      branch: "deps/update-2026-03-30",
+      report: makeReport(), hasSecurityFixes: false,
+    });
+    const call = octokit.rest.pulls.create.mock.calls[0][0];
+    expect(call.draft).toBe(false);
   });
 });

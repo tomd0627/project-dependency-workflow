@@ -8,6 +8,7 @@ import {
   detectEcosystems,
   fetchLatestNpmVersion,
   fetchManifestContent,
+  filterHeldPackages,
   isNewer,
   parsePackageJsonDependencies,
   scanNodeEcosystem,
@@ -323,6 +324,62 @@ describe("scanNodeEcosystem", () => {
 });
 
 // ── scanRepository ────────────────────────────────────────────────────────────
+
+// ── filterHeldPackages ────────────────────────────────────────────────────────
+
+/** Minimal OutdatedPackage fixture. */
+const makeOutdated = (name, latest, overrides = {}) => ({
+  name,
+  current: "1.0.0",
+  latest,
+  updateType: "major",
+  ecosystem: "node",
+  ...overrides,
+});
+
+describe("filterHeldPackages", () => {
+  it("returns the list unchanged when heldPackages is empty", () => {
+    const outdated = [makeOutdated("lodash", "5.0.0")];
+    expect(filterHeldPackages(outdated, {})).toEqual(outdated);
+  });
+
+  it("keeps a package whose latest satisfies the hold range", () => {
+    const outdated = [makeOutdated("typescript", "5.8.3")];
+    expect(filterHeldPackages(outdated, { typescript: "< 6" })).toHaveLength(1);
+  });
+
+  it("removes a package whose latest does not satisfy the hold range", () => {
+    const outdated = [makeOutdated("typescript", "6.0.2")];
+    expect(filterHeldPackages(outdated, { typescript: "< 6" })).toHaveLength(0);
+  });
+
+  it("only filters the held package — other packages are untouched", () => {
+    const outdated = [
+      makeOutdated("typescript", "6.0.2"),
+      makeOutdated("lodash", "5.0.0"),
+    ];
+    const result = filterHeldPackages(outdated, { typescript: "< 6" });
+    expect(result).toHaveLength(1);
+    expect(result[0].name).toBe("lodash");
+  });
+
+  it("handles multiple hold constraints simultaneously", () => {
+    const outdated = [
+      makeOutdated("typescript", "6.0.2"),
+      makeOutdated("sass", "1.99.0"),
+      makeOutdated("lodash", "5.0.0"),
+    ];
+    const result = filterHeldPackages(outdated, { typescript: "< 6", sass: "< 1.99" });
+    expect(result).toHaveLength(1);
+    expect(result[0].name).toBe("lodash");
+  });
+
+  it("passes through all packages when heldPackages is null/undefined", () => {
+    const outdated = [makeOutdated("typescript", "6.0.2")];
+    expect(filterHeldPackages(outdated, null)).toEqual(outdated);
+    expect(filterHeldPackages(outdated, undefined)).toEqual(outdated);
+  });
+});
 
 describe("scanRepository", () => {
   let originalFetch;

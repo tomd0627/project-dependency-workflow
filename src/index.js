@@ -110,11 +110,12 @@ async function cloneRepo(token, owner, repo) {
  * @param {string} owner
  * @param {string} repo
  * @param {string[]} packageSpecs - e.g. ["lodash@4.17.21"] for the commit message
+ * @param {string} [commitMessage] - Override for the commit message; defaults to "deps: update <specs>"
  * @returns {Promise<void>}
  */
-async function commitAndPush(dir, branch, token, owner, repo, packageSpecs) {
+async function commitAndPush(dir, branch, token, owner, repo, packageSpecs, commitMessage) {
   const remote = `https://x-access-token:${token}@github.com/${owner}/${repo}.git`;
-  const message = `deps: update ${packageSpecs.join(", ")}`;
+  const message = commitMessage ?? `deps: update ${packageSpecs.join(", ")}`;
 
   await exec(`git -C "${dir}" config user.email "dep-bot@users.noreply.github.com"`);
   await exec(`git -C "${dir}" config user.name "Dep Bot"`);
@@ -277,6 +278,10 @@ async function processEcosystem({ octokit, client, token, owner, repo, scanResul
   // skipped — the branch creation and PR gate are sufficient to validate pipeline
   // flow without writing to disk or running arbitrary test commands.
   let qaFailed = false;
+  // Set to true when autofix is exhausted on a major update — triggers a draft
+  // PR instead of silently skipping, giving the developer visibility and a
+  // work item to resolve the breaking changes manually.
+  let openAsDraft = false;
 
   if (dryRun) {
     logger.info(
@@ -318,11 +323,20 @@ async function processEcosystem({ octokit, client, token, owner, repo, scanResul
           });
 
           if (!fixResult.fixed) {
-            logger.warn(
-              { owner, repo, ecosystem, attempts: fixResult.attempts },
-              "Autofix exhausted — skipping PR for this cycle"
-            );
-            qaFailed = true;
+            const hasMajorUpdate = analysisResults.some((r) => r.updateType === "major");
+            if (hasMajorUpdate) {
+              logger.warn(
+                { owner, repo, ecosystem, attempts: fixResult.attempts },
+                "Autofix exhausted on major update — will open draft PR for manual resolution"
+              );
+              openAsDraft = true;
+            } else {
+              logger.warn(
+                { owner, repo, ecosystem, attempts: fixResult.attempts },
+                "Autofix exhausted — skipping PR for this cycle"
+              );
+              qaFailed = true;
+            }
           } else {
             logger.info({ owner, repo, ecosystem, attempts: fixResult.attempts }, "Autofix succeeded");
           }
@@ -339,18 +353,30 @@ async function processEcosystem({ octokit, client, token, owner, repo, scanResul
           logger.info({ owner, repo, ecosystem, stage: STAGE.QA }, "Running build step");
           const buildResult = await runTestSuite({ repoPath: cloneDir, command: buildCommand });
           if (!buildResult.passed) {
-            logger.warn(
-              { owner, repo, ecosystem },
-              "Build failed after dependency update — skipping PR for this cycle"
-            );
-            qaFailed = true;
+            const hasMajorUpdate = analysisResults.some((r) => r.updateType === "major");
+            if (hasMajorUpdate) {
+              logger.warn(
+                { owner, repo, ecosystem },
+                "Build failed after major update — will open draft PR for manual resolution"
+              );
+              openAsDraft = true;
+            } else {
+              logger.warn(
+                { owner, repo, ecosystem },
+                "Build failed after dependency update — skipping PR for this cycle"
+              );
+              qaFailed = true;
+            }
           }
         }
       }
 
       if (!qaFailed) {
         const packageSpecs = packages.map((p) => `${p.name}@${p.version}`);
-        await commitAndPush(cloneDir, branch, token, owner, repo, packageSpecs);
+        const commitMessage = openAsDraft
+          ? `deps: update ${packageSpecs.join(", ")} [build failed — manual fix required]`
+          : `deps: update ${packageSpecs.join(", ")}`;
+        await commitAndPush(cloneDir, branch, token, owner, repo, packageSpecs, commitMessage);
       }
     } catch (err) {
       logger.error(
@@ -378,6 +404,17 @@ async function processEcosystem({ octokit, client, token, owner, repo, scanResul
     return { name: `${owner}/${repo}`, ecosystem, updates: enrichedUpdates, pr: null };
   }
 
+  if (openAsDraft && issueResult && !dryRun) {
+    await octokit.rest.issues.createComment({
+      owner,
+      repo,
+      issue_number: issueResult.issueNumber,
+      body: "🚧 **Build failed after applying major update — opening a draft PR.**\n\nThe dependency version bump has been committed but the build or test suite did not pass (expected for major version upgrades with breaking changes). A draft PR has been opened so you can resolve the breaking changes directly on the branch.",
+    }).catch((err) => {
+      logger.warn({ owner, repo, error: err.message }, "Failed to post draft PR notice on issue");
+    });
+  }
+
   // ── PUSH ──────────────────────────────────────────────────────────────────────
   logger.info({ owner, repo, ecosystem, stage: STAGE.PUSH }, "Opening pull request");
 
@@ -388,11 +425,13 @@ async function processEcosystem({ octokit, client, token, owner, repo, scanResul
     branch,
     report,
     hasSecurityFixes,
+    draft: openAsDraft,
+    qaFailed: openAsDraft,
     dryRun,
   });
 
   const prEntry = prResult
-    ? { number: prResult.prNumber, url: prResult.prUrl, status: "open" }
+    ? { number: prResult.prNumber, url: prResult.prUrl, status: openAsDraft ? "draft" : "open" }
     : null;
 
   logger.info(
@@ -470,7 +509,7 @@ async function run() {
 
     let scanResults;
     try {
-      scanResults = await scanRepository(octokit, owner, repo, allowedEcosystems);
+      scanResults = await scanRepository(octokit, owner, repo, allowedEcosystems, config.held_packages ?? {});
     } catch (err) {
       logger.error({ repo: repoMeta.full_name, error: err.message }, "Scan failed — skipping");
       return [];
