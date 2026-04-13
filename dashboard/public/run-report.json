@@ -1,41 +1,52 @@
 {
-  "runAt": "2026-04-07T05:01:54.411Z",
-  "durationSeconds": 124.3,
+  "runAt": "2026-04-13T17:15:34.050Z",
+  "durationSeconds": 123.3,
   "repositories": [
     {
-      "name": "tomd0627/tom-deluca-dev-v2",
+      "name": "tomd0627/finance-app-claude",
       "ecosystem": "node",
       "updates": [
         {
-          "packageName": "typescript",
-          "currentVersion": "4.8.3",
-          "latestVersion": "6.0.2",
-          "updateType": "major",
-          "riskScore": 85,
+          "packageName": "@biomejs/biome",
+          "currentVersion": "unknown",
+          "latestVersion": "2.4.11",
+          "updateType": "patch",
+          "riskScore": 50,
           "recommendation": "NEEDS_REVIEW",
-          "summary": "This is a major version upgrade from TypeScript 4.8.3 to 6.0.2, skipping the entire 5.x release line. Major TypeScript releases typically introduce breaking changes that can affect compilation, type checking, and require code modifications. The changelog provides minimal detail, only referencing external resources for specific changes.",
-          "breakingChanges": [
-            "Potential breaking changes in type system and compiler behavior between major versions",
-            "Possible deprecation or removal of legacy TypeScript features",
-            "Changes to module resolution and compilation target defaults",
-            "Updates to strict type checking rules and inference"
-          ],
-          "ramifications": [
-            "Existing TypeScript code may fail to compile without modifications",
-            "Build systems and tooling configurations may need updates",
-            "Third-party type definitions may be incompatible with the new version",
-            "Development team will need time to review and adapt to new TypeScript features and breaking changes",
-            "Extensive testing required across the entire codebase to ensure compatibility"
-          ],
+          "summary": "Analysis unavailable — Claude API failed after retries.",
+          "breakingChanges": [],
+          "ramifications": [],
+          "changelogUrl": null,
+          "advisories": []
+        },
+        {
+          "packageName": "concurrently",
+          "currentVersion": "unknown",
+          "latestVersion": "9.2.1",
+          "updateType": "patch",
+          "riskScore": 50,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "Analysis unavailable — Claude API failed after retries.",
+          "breakingChanges": [],
+          "ramifications": [],
+          "changelogUrl": "https://github.com/open-cli-tools/concurrently/releases/tag/v9.2.1",
+          "advisories": []
+        },
+        {
+          "packageName": "typescript",
+          "currentVersion": "unknown",
+          "latestVersion": "6.0.2",
+          "updateType": "patch",
+          "riskScore": 50,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "Analysis unavailable — Claude API failed after retries.",
+          "breakingChanges": [],
+          "ramifications": [],
           "changelogUrl": "https://github.com/microsoft/TypeScript/releases/tag/v6.0.2",
           "advisories": []
         }
       ],
-      "pr": {
-        "number": 5,
-        "url": "https://github.com/tomd0627/tom-deluca-dev-v2/pull/5",
-        "status": "open"
-      }
+      "pr": null
     }
   ]
 }
