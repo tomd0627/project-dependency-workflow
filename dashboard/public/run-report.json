@@ -1,24 +1,11 @@
 {
-  "runAt": "2026-04-13T17:15:34.050Z",
-  "durationSeconds": 123.3,
+  "runAt": "2026-04-13T17:59:37.724Z",
+  "durationSeconds": 119.3,
   "repositories": [
     {
-      "name": "tomd0627/finance-app-claude",
+      "name": "tomd0627/character-clash",
       "ecosystem": "node",
       "updates": [
-        {
-          "packageName": "@biomejs/biome",
-          "currentVersion": "unknown",
-          "latestVersion": "2.4.11",
-          "updateType": "patch",
-          "riskScore": 50,
-          "recommendation": "NEEDS_REVIEW",
-          "summary": "Analysis unavailable — Claude API failed after retries.",
-          "breakingChanges": [],
-          "ramifications": [],
-          "changelogUrl": null,
-          "advisories": []
-        },
         {
           "packageName": "concurrently",
           "currentVersion": "unknown",
@@ -33,16 +20,16 @@
           "advisories": []
         },
         {
-          "packageName": "typescript",
+          "packageName": "prettier",
           "currentVersion": "unknown",
-          "latestVersion": "6.0.2",
+          "latestVersion": "3.8.2",
           "updateType": "patch",
           "riskScore": 50,
           "recommendation": "NEEDS_REVIEW",
           "summary": "Analysis unavailable — Claude API failed after retries.",
           "breakingChanges": [],
           "ramifications": [],
-          "changelogUrl": "https://github.com/microsoft/TypeScript/releases/tag/v6.0.2",
+          "changelogUrl": "https://github.com/prettier/prettier/releases/tag/3.8.2",
           "advisories": []
         }
       ],
