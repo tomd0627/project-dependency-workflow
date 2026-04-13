@@ -1,0 +1,34 @@
+{
+  "schedule": "0 8 * * 1",
+  "github_username": "tomd0627",
+  "excluded_repos": [
+    "javascript30", 
+    "javascript-weather-app", 
+    "react-calculator", 
+    "react-blog", 
+    "react-recipe-app", 
+    "react-typescript-multistep-form", 
+    "react-currency-converter", 
+    "react-typescript-select", 
+    "mozilla-react-todo", 
+    "Harvest"
+  ],
+  "priority_repos": [],
+  "notification_webhook": "",
+  "approval_timeout_hours": 48,
+  "minor_auto_approve_delay_hours": 6,
+  "max_autofix_attempts": 3,
+  "auto_approve_patch": true,
+  "auto_approve_minor": true,
+  "auto_approve_major": false,
+  "risk_threshold_auto_approve": 50,
+  "dry_run": false,
+  "cache_ttl_hours": 24,
+  "scan_ecosystems": ["node"],
+  "repo_concurrency": 5,
+  "held_packages": {
+    "typescript": "< 6",
+    "sass": "< 1.99",
+    "lucide": "< 1.7"
+  }
+}
