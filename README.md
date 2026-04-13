@@ -19,9 +19,8 @@ flowchart TD
     E --> F[NOTIFY\nOpen structured GitHub Issue]
     F --> G{GATE\nApproval required?}
     G -- Auto-approved --> H[BRANCH\nCreate deps/update-YYYY-MM-DD]
-    G -- Needs approval --> G2[GATE\nIssue created — comment APPROVE or SKIP\nApproval Watcher detects response every 30 min]
+    G -- Needs approval --> G2[GATE\nIssue created — comment APPROVE\nApproval Watcher re-triggers pipeline per repo]
     G2 -- Approved --> H
-    G2 -- Skipped --> Z[Skip — log reason]
     H --> I[UPDATE\nApply via package manager]
     I --> J[QA\nRun test suite]
     J -- Pass --> K[PUSH\nOpen PR with structured summary]
@@ -110,7 +109,6 @@ flowchart TD
 | `excluded_repos` | string[] | `[]` | Repository names to skip entirely. |
 | `priority_repos` | string[] | `[]` | Repositories to process first in each run. |
 | `notification_webhook` | string | `""` | Discord webhook URL fallback (overridden by `DISCORD_WEBHOOK` env var). |
-| `approval_timeout_hours` | number | `48` | Hours to wait for an approval comment before skipping a gated update. |
 | `max_autofix_attempts` | number | `3` | Maximum Claude-powered autofix iterations per test failure. |
 | `auto_approve_patch` | boolean | `true` | Auto-approve patch updates below the risk threshold. |
 | `auto_approve_minor` | boolean | `true` | Auto-approve minor updates below the risk threshold. |

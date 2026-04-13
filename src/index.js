@@ -29,7 +29,6 @@ import {
   STAGE,
 } from "./constants.js";
 import { createOctokitClient, discoverRepositories } from "./discovery.js";
-import { waitForApproval } from "./gate.js";
 import { logger } from "./logger.js";
 import { createReportIssue, sendWebhookNotification } from "./notifier.js";
 import { createUpdateBranch, deleteUpdateBranch, openPullRequest } from "./publisher.js";
@@ -242,29 +241,29 @@ async function processEcosystem({ octokit, client, token, owner, repo, scanResul
   }
 
   // ── GATE ──────────────────────────────────────────────────────────────────────
+  // Non-blocking: check once for an existing APPROVE comment. If absent, post
+  // the issue and exit immediately — the approve-watcher runs on its own schedule
+  // and re-invokes this pipeline (via TARGET_REPO) once it detects the approval.
+  // This keeps the main scan job fast regardless of how many repos need review.
   if (needsGate(analysisResults, config)) {
-    logger.info({ owner, repo, ecosystem, stage: STAGE.GATE }, "High-risk or major update — awaiting approval");
+    logger.info({ owner, repo, ecosystem, stage: STAGE.GATE }, "High-risk or major update — checking for prior approval");
 
+    let approved = false;
     if (issueResult) {
-      const decision = await waitForApproval({
-        octokit,
+      const { data: comments } = await octokit.rest.issues.listComments({
         owner,
         repo,
-        issueNumber: issueResult.issueNumber,
-        timeoutHours: config.approval_timeout_hours ?? GATE.DEFAULT_TIMEOUT_HOURS,
-        dryRun,
+        issue_number: issueResult.issueNumber,
       });
-
-      if (decision === "timeout") {
-        logger.warn({ owner, repo, ecosystem }, "Approval gate timed out — skipping this cycle");
-        return { name: `${owner}/${repo}`, ecosystem, updates: enrichedUpdates, pr: null };
-      }
-
-      if (decision === "skipped") {
-        logger.info({ owner, repo, ecosystem }, "Update skipped by owner");
-        return { name: `${owner}/${repo}`, ecosystem, updates: enrichedUpdates, pr: null };
-      }
+      approved = comments.some((c) => (c.body ?? "").trim().toUpperCase().includes(GATE.APPROVE_KEYWORD));
     }
+
+    if (!approved) {
+      logger.info({ owner, repo, ecosystem }, "Awaiting approval — issue created, approve-watcher will trigger PR when approved");
+      return { name: `${owner}/${repo}`, ecosystem, updates: enrichedUpdates, pr: null };
+    }
+
+    logger.info({ owner, repo, ecosystem }, "Prior approval found — proceeding to update");
   }
 
   // ── BRANCH ───────────────────────────────────────────────────────────────────
