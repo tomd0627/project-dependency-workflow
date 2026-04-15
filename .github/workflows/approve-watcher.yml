@@ -43,6 +43,7 @@ jobs:
         run: node src/approve-watcher.js
 
       - name: Commit run report for dashboard
+        id: commit_report
         run: |
           if [ -f ".cache/run-report.json" ]; then
             mkdir -p dashboard/public
@@ -50,11 +51,17 @@ jobs:
             git config user.name "Dep Bot"
             git config user.email "dep-bot@users.noreply.github.com"
             git add dashboard/public/run-report.json
-            git diff --staged --quiet || git commit -m "chore: update dashboard run report [skip ci]"
-            git push
+            if git diff --staged --quiet; then
+              echo "changed=false" >> "$GITHUB_OUTPUT"
+            else
+              git commit -m "chore: update dashboard run report [skip ci]"
+              git push
+              echo "changed=true" >> "$GITHUB_OUTPUT"
+            fi
           fi
 
       - name: Trigger Netlify dashboard rebuild
+        if: steps.commit_report.outputs.changed == 'true'
         env:
           NETLIFY_BUILD_HOOK: ${{ secrets.NETLIFY_BUILD_HOOK }}
         run: |
