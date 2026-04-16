@@ -26,7 +26,8 @@ flowchart TD
     J -- Pass --> K[PUSH\nOpen PR with structured summary]
     J -- Fail --> L[AUTOFIX\nClaude fix loop × 3]
     L -- Fixed --> K
-    L -- Failed --> Z2[Skip — log failure]
+    L -- "Failed (minor/patch)" --> Z2[Skip — log failure]
+    L -- "Failed (major)" --> Z3[Open draft PR\nfor manual resolution]
     K --> M[ROLLBACK\nPoll CI 30 min post-merge]
     M -- CI fail --> N[Post revert instructions on PR\nOpen tracking issue]
     M -- CI pass --> O[Done]
@@ -96,6 +97,7 @@ flowchart TD
 | `NTFY_TOPIC` | No | ntfy.sh topic name for push notifications. |
 | `TARGET_REPO` | No | Limit run to a single repository by name or full name (e.g. `my-repo` or `username/my-repo`). |
 | `DRY_RUN` | No | Set to `"true"` to run without making any changes. Overrides `bot.config.json`. |
+| `NOTIFY_USERNAME` | No | GitHub username to @-mention in issue notifications. Falls back to `github_username` in `bot.config.json`. |
 | `LOG_LEVEL` | No | Pino log level. Defaults to `"info"`. |
 
 ---
