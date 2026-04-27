@@ -12,8 +12,8 @@
 import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { createOctokitClient } from "./discovery.js";
 import { GATE, NOTIFIER, PR } from "./constants.js";
+import { createOctokitClient } from "./discovery.js";
 import { logger } from "./logger.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -52,14 +52,20 @@ async function findApprovedRepos(octokit) {
     data: { login: me },
   } = await octokit.rest.users.getAuthenticated();
 
-  // Search across all repos for dep-bot issues authored by this account.
-  // The `is:issue` qualifier excludes PRs from the results.
+  // Omit author: — issues may be created by github-actions[bot] or the PAT
+  // user depending on which secret is in use. Scope to the authenticated
+  // user's repos with user: instead, then filter by title prefix in code.
+  const query = `is:issue label:${PR.LABELS[0]} label:${PR.LABELS[1]} user:${me}`;
+  logger.info({ me, query }, "Searching for dep-bot issues");
+
   const { data: searchResult } = await octokit.rest.search.issuesAndPullRequests({
-    q: `is:issue label:${PR.LABELS[0]} label:${PR.LABELS[1]} author:${me}`,
+    q: query,
     sort: "updated",
     order: "desc",
     per_page: 100,
   });
+
+  logger.info({ totalCount: searchResult.total_count, returned: searchResult.items.length }, "Search complete");
 
   const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
   const approved = new Set();
@@ -89,7 +95,7 @@ async function findApprovedRepos(octokit) {
     );
 
     if (!isApproved) {
-      logger.debug({ repo: fullName, issue: issue.number }, "Issue has no APPROVE comment — skipping");
+      logger.info({ repo: fullName, issue: issue.number, commentCount: comments.length }, "Issue has no APPROVE comment — skipping");
       continue;
     }
 
