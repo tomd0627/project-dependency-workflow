@@ -1,52 +1,5 @@
 {
-  "runAt": "2026-05-04T18:04:01.836Z",
-  "durationSeconds": 23.8,
-  "repositories": [
-    {
-      "name": "tomd0627/ui-roaster",
-      "ecosystem": "node",
-      "updates": [
-        {
-          "packageName": "@anthropic-ai/sdk",
-          "currentVersion": "0.92.0",
-          "latestVersion": "0.93.0",
-          "updateType": "minor",
-          "riskScore": 35,
-          "recommendation": "NEEDS_REVIEW",
-          "summary": "This is a minor version update for the Anthropic AI SDK with no changelog provided. While minor updates typically don't include breaking changes, the lack of changelog information makes it difficult to assess the specific changes and potential impact. Given this is an AI SDK that may have evolving APIs, cautious testing is recommended.",
-          "breakingChanges": [],
-          "ramifications": [
-            "Unknown changes due to missing changelog - could include new features, bug fixes, or API modifications",
-            "Potential behavioral changes in AI model interactions or response handling",
-            "May include dependency updates that could affect compatibility",
-            "Could introduce new optional parameters or modify default behaviors"
-          ],
-          "changelogUrl": null,
-          "advisories": [
-            {
-              "ghsaId": "GHSA-p7fg-763f-g4gf",
-              "severity": "MODERATE",
-              "summary": "Claude SDK for TypeScript has Insecure Default File Permissions in Local Filesystem Memory Tool",
-              "affectedRange": ">= 0.79.0, < 0.91.1",
-              "patchedVersion": "0.91.1",
-              "packageName": "@anthropic-ai/sdk"
-            },
-            {
-              "ghsaId": "GHSA-5474-4w2j-mq4c",
-              "severity": "MODERATE",
-              "summary": "Claude SDK for TypeScript: Memory Tool Path Validation Allows Sandbox Escape to Sibling Directories",
-              "affectedRange": ">= 0.79.0, < 0.81.0",
-              "patchedVersion": "0.81.0",
-              "packageName": "@anthropic-ai/sdk"
-            }
-          ]
-        }
-      ],
-      "pr": {
-        "number": 13,
-        "url": "https://github.com/tomd0627/ui-roaster/pull/13",
-        "status": "open"
-      }
-    }
-  ]
+  "runAt": "2026-05-04T19:27:05.899Z",
+  "durationSeconds": 0.9,
+  "repositories": []
 }
