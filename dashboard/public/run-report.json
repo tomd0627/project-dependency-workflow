@@ -1,77 +1,54 @@
 {
-  "runAt": "2026-05-04T12:13:53.887Z",
-  "durationSeconds": 30.8,
+  "runAt": "2026-05-04T14:49:08.110Z",
+  "durationSeconds": 37.9,
   "repositories": [
     {
-      "name": "tomd0627/ui-roaster",
+      "name": "tomd0627/sitecore-migration-simulator",
       "ecosystem": "node",
       "updates": [
         {
-          "packageName": "@anthropic-ai/sdk",
-          "currentVersion": "0.88.0",
-          "latestVersion": "0.92.0",
-          "updateType": "minor",
-          "riskScore": 45,
-          "recommendation": "NEEDS_REVIEW",
-          "summary": "This is a minor version update for the Anthropic AI SDK with no changelog provided, making it difficult to assess specific changes. Minor updates typically include new features and improvements but may also introduce behavioral changes. The lack of changelog information increases uncertainty about the update's impact.",
-          "breakingChanges": [],
-          "ramifications": [
-            "New features or API methods may be available",
-            "Potential behavioral changes in existing functionality",
-            "Dependencies may have been updated",
-            "Bug fixes and performance improvements likely included",
-            "Integration testing recommended due to missing changelog"
-          ],
-          "changelogUrl": null,
-          "advisories": [
-            {
-              "ghsaId": "GHSA-p7fg-763f-g4gf",
-              "severity": "MODERATE",
-              "summary": "Claude SDK for TypeScript has Insecure Default File Permissions in Local Filesystem Memory Tool",
-              "affectedRange": ">= 0.79.0, < 0.91.1",
-              "patchedVersion": "0.91.1",
-              "packageName": "@anthropic-ai/sdk"
-            },
-            {
-              "ghsaId": "GHSA-5474-4w2j-mq4c",
-              "severity": "MODERATE",
-              "summary": "Claude SDK for TypeScript: Memory Tool Path Validation Allows Sandbox Escape to Sibling Directories",
-              "affectedRange": ">= 0.79.0, < 0.81.0",
-              "patchedVersion": "0.81.0",
-              "packageName": "@anthropic-ai/sdk"
-            }
-          ]
-        },
-        {
           "packageName": "lucide-react",
-          "currentVersion": "1.8.0",
+          "currentVersion": "0.475.0",
           "latestVersion": "1.14.0",
-          "updateType": "minor",
-          "riskScore": 15,
-          "recommendation": "THUMBS_UP",
-          "summary": "This is a low-risk minor version update that primarily adds new icons to the lucide-react icon library. The changelog shows only additive changes with a new 'repeat-off' icon, indicating no breaking changes or API modifications.",
-          "breakingChanges": [],
+          "updateType": "major",
+          "riskScore": 75,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "This is a major version upgrade from 0.x to 1.x which indicates potential breaking changes, though the provided changelog only shows addition of a new icon. The significant version jump suggests there may be API changes, dependency updates, or other breaking modifications not detailed in this partial changelog.",
+          "breakingChanges": [
+            "Major version bump from 0.x to 1.x typically indicates breaking changes",
+            "Potential API changes not documented in provided changelog excerpt"
+          ],
           "ramifications": [
-            "New 'repeat-off' icon will be available for use in applications",
-            "Bundle size may increase slightly due to additional icon",
-            "No existing functionality should be affected"
+            "May require code changes to maintain compatibility",
+            "Could affect existing icon imports or component props",
+            "Potential changes to bundle size or performance characteristics",
+            "Risk of runtime errors if breaking changes exist"
           ],
           "changelogUrl": "https://github.com/lucide-icons/lucide/compare/1.13.0...1.14.0",
           "advisories": []
         },
         {
           "packageName": "next",
-          "currentVersion": "16.2.3",
+          "currentVersion": "15.1.0",
           "latestVersion": "16.2.4",
-          "updateType": "patch",
-          "riskScore": 15,
-          "recommendation": "THUMBS_UP",
-          "summary": "This is a patch version update for Next.js with no provided changelog information. Patch updates typically contain bug fixes and security patches with minimal risk of breaking changes. The absence of changelog details slightly increases uncertainty but the patch nature keeps risk low.",
-          "breakingChanges": [],
+          "updateType": "major",
+          "riskScore": 85,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "This is a major version upgrade from Next.js 15.1.0 to 16.2.4, which typically introduces significant breaking changes and new features. Without access to the changelog, this upgrade carries high risk and requires thorough testing of all application functionality.",
+          "breakingChanges": [
+            "Potential API changes in major version upgrade",
+            "Possible changes to routing behavior",
+            "Potential modifications to build process and configuration",
+            "Likely changes to React compatibility requirements",
+            "Possible breaking changes in middleware or edge runtime"
+          ],
           "ramifications": [
-            "Potential bug fixes and security improvements",
-            "Minimal risk of behavioral changes in existing functionality",
-            "May include performance optimizations or dependency updates"
+            "Application may fail to build or run without code modifications",
+            "Dependencies may need updating to maintain compatibility",
+            "Performance characteristics may change significantly",
+            "Development and production deployment processes may require updates",
+            "Third-party integrations and plugins may break",
+            "Testing suite may need updates due to framework changes"
           ],
           "changelogUrl": null,
           "advisories": [
@@ -238,34 +215,242 @@
           ]
         },
         {
-          "packageName": "@netlify/plugin-nextjs",
-          "currentVersion": "5.15.9",
-          "latestVersion": "5.15.10",
-          "updateType": "patch",
-          "riskScore": 15,
+          "packageName": "react",
+          "currentVersion": "19.0.0",
+          "latestVersion": "19.2.5",
+          "updateType": "minor",
+          "riskScore": 25,
           "recommendation": "THUMBS_UP",
-          "summary": "This patch release contains two targeted bug fixes related to URL rewrites and caching behavior. Both fixes address edge cases that could cause incorrect optimization or missing cache tags, making this a low-risk improvement update.",
+          "summary": "This minor version update includes bug fixes and improvements to React Server Components, specifically adding cycle protection mechanisms. The changes appear to be internal improvements focused on stability and error prevention rather than API changes.",
           "breakingChanges": [],
           "ramifications": [
-            "Same-URL rewrites will no longer be incorrectly optimized when response headers need to be applied",
-            "Static props redirects will now properly receive cache tags, improving cache invalidation behavior"
+            "Improved cycle detection in React Server Components may affect edge cases where circular dependencies were previously allowed",
+            "Enhanced stability and error handling in server-side rendering scenarios",
+            "Potential performance improvements in applications using React Server Components"
           ],
-          "changelogUrl": "https://github.com/opennextjs/opennextjs-netlify/compare/v5.15.9...v5.15.10",
+          "changelogUrl": "https://github.com/facebook/react/releases/tag/v19.2.5",
+          "advisories": [
+            {
+              "ghsaId": "GHSA-hg79-j56m-fxgv",
+              "severity": "HIGH",
+              "summary": "Cross-Site Scripting in react",
+              "affectedRange": ">= 0.0.1, < 0.14.0",
+              "patchedVersion": "0.14.0",
+              "packageName": "react"
+            },
+            {
+              "ghsaId": "GHSA-g53w-52xc-2j85",
+              "severity": "MODERATE",
+              "summary": "Cross-Site Scripting in react",
+              "affectedRange": ">= 0.5.0, < 0.5.2",
+              "patchedVersion": "0.5.2",
+              "packageName": "react"
+            },
+            {
+              "ghsaId": "GHSA-g53w-52xc-2j85",
+              "severity": "MODERATE",
+              "summary": "Cross-Site Scripting in react",
+              "affectedRange": ">= 0.4.0, < 0.4.2",
+              "patchedVersion": "0.4.2",
+              "packageName": "react"
+            }
+          ]
+        },
+        {
+          "packageName": "react-dom",
+          "currentVersion": "19.0.0",
+          "latestVersion": "19.2.5",
+          "updateType": "minor",
+          "riskScore": 25,
+          "recommendation": "THUMBS_UP",
+          "summary": "This minor update adds cycle protections for React Server Components, which is a stability improvement. The change appears to be defensive programming to prevent infinite loops or circular dependencies in server components rendering.",
+          "breakingChanges": [],
+          "ramifications": [
+            "Enhanced stability and error prevention in React Server Components",
+            "Potential performance improvements through better cycle detection",
+            "May reveal previously hidden circular dependency issues in server components"
+          ],
+          "changelogUrl": "https://github.com/facebook/react/releases/tag/v19.2.5",
+          "advisories": [
+            {
+              "ghsaId": "GHSA-mvjj-gqq2-p4hw",
+              "severity": "MODERATE",
+              "summary": "Cross-Site Scripting in react-dom",
+              "affectedRange": ">= 16.4.0, < 16.4.2",
+              "patchedVersion": "16.4.2",
+              "packageName": "react-dom"
+            },
+            {
+              "ghsaId": "GHSA-mvjj-gqq2-p4hw",
+              "severity": "MODERATE",
+              "summary": "Cross-Site Scripting in react-dom",
+              "affectedRange": ">= 16.3.0, < 16.3.3",
+              "patchedVersion": "16.3.3",
+              "packageName": "react-dom"
+            },
+            {
+              "ghsaId": "GHSA-mvjj-gqq2-p4hw",
+              "severity": "MODERATE",
+              "summary": "Cross-Site Scripting in react-dom",
+              "affectedRange": "= 16.2.0",
+              "patchedVersion": "16.2.1",
+              "packageName": "react-dom"
+            },
+            {
+              "ghsaId": "GHSA-mvjj-gqq2-p4hw",
+              "severity": "MODERATE",
+              "summary": "Cross-Site Scripting in react-dom",
+              "affectedRange": ">= 16.1.0, < 16.1.2",
+              "patchedVersion": "16.1.2",
+              "packageName": "react-dom"
+            },
+            {
+              "ghsaId": "GHSA-mvjj-gqq2-p4hw",
+              "severity": "MODERATE",
+              "summary": "Cross-Site Scripting in react-dom",
+              "affectedRange": "= 16.0.0",
+              "patchedVersion": "16.0.1",
+              "packageName": "react-dom"
+            }
+          ]
+        },
+        {
+          "packageName": "shiki",
+          "currentVersion": "1.24.0",
+          "latestVersion": "4.0.2",
+          "updateType": "major",
+          "riskScore": 85,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "This is a major version upgrade from 1.24.0 to 4.0.2, spanning multiple major versions which typically indicates significant breaking changes. The provided changelog only shows minor bug fixes for v4.0.2, but the major version jump suggests substantial architectural changes occurred between v1.x and v4.x that are not documented here.",
+          "breakingChanges": [
+            "Multiple major version increments (1.x to 4.x) likely introduce breaking API changes",
+            "Potential changes to syntax highlighting engine or theme system",
+            "Possible modifications to language support or configuration structure"
+          ],
+          "ramifications": [
+            "Code using shiki highlighting APIs may need significant refactoring",
+            "Theme configurations and language definitions may require updates",
+            "Integration with build systems or bundlers may need adjustment",
+            "Existing syntax highlighting output may change appearance or behavior",
+            "Dependencies on specific shiki internal APIs may break"
+          ],
+          "changelogUrl": "https://github.com/shikijs/shiki/compare/v4.0.1...v4.0.2",
+          "advisories": []
+        },
+        {
+          "packageName": "tailwind-merge",
+          "currentVersion": "2.6.0",
+          "latestVersion": "3.5.0",
+          "updateType": "major",
+          "riskScore": 75,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "This is a major version upgrade from 2.6.0 to 3.5.0 with support for Tailwind CSS v4.2. While the changelog only shows new features, major version bumps typically indicate breaking changes that require careful testing.",
+          "breakingChanges": [
+            "Major version upgrade suggests potential API changes",
+            "Possible breaking changes in class merging behavior",
+            "May require updates to accommodate Tailwind CSS v4.2 compatibility"
+          ],
+          "ramifications": [
+            "Need to verify compatibility with existing Tailwind CSS version",
+            "Potential changes in class merging logic may affect styling",
+            "TypeScript definitions may have changed",
+            "Bundle size may be affected",
+            "Testing required to ensure no visual regressions"
+          ],
+          "changelogUrl": "https://github.com/dcastil/tailwind-merge/compare/v3.4.1...v3.5.0",
+          "advisories": []
+        },
+        {
+          "packageName": "@tailwindcss/postcss",
+          "currentVersion": "4.0.0",
+          "latestVersion": "4.2.4",
+          "updateType": "minor",
+          "riskScore": 15,
+          "recommendation": "THUMBS_UP",
+          "summary": "This minor update contains only bug fixes that improve import resolution when using Vite aliases. The changes are focused on fixing existing functionality rather than introducing new features, making it a low-risk upgrade.",
+          "breakingChanges": [],
+          "ramifications": [
+            "Improved import resolution for @import and @plugin when using Vite aliases",
+            "Better compatibility with Vite-based build systems",
+            "Potential resolution of build issues for projects using both TailwindCSS and Vite aliases"
+          ],
+          "changelogUrl": "https://github.com/tailwindlabs/tailwindcss/releases/tag/v4.2.4",
+          "advisories": []
+        },
+        {
+          "packageName": "@types/node",
+          "currentVersion": "22.0.0",
+          "latestVersion": "25.6.0",
+          "updateType": "major",
+          "riskScore": 75,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "This is a major version upgrade for TypeScript definitions of Node.js, jumping from v22 to v25. Major version updates in @types/node typically introduce breaking changes in type definitions that may require code modifications. Without access to the changelog, the specific breaking changes are unknown, but the 3-major-version jump suggests significant API changes.",
+          "breakingChanges": [
+            "Potential removal of deprecated Node.js API type definitions",
+            "Changes to existing type signatures for Node.js built-in modules",
+            "Updates to reflect Node.js API changes between versions 22 and 25"
+          ],
+          "ramifications": [
+            "TypeScript compilation errors may occur due to changed type definitions",
+            "Code using deprecated Node.js APIs may need refactoring",
+            "Third-party packages may be incompatible with newer type definitions",
+            "Development workflow may be disrupted until type issues are resolved"
+          ],
+          "changelogUrl": null,
+          "advisories": []
+        },
+        {
+          "packageName": "@types/react",
+          "currentVersion": "19.0.0",
+          "latestVersion": "19.2.14",
+          "updateType": "minor",
+          "riskScore": 15,
+          "recommendation": "THUMBS_UP",
+          "summary": "This is a minor version update for React TypeScript definitions with no changelog provided. Type definition packages typically contain non-breaking improvements and bug fixes. The risk is minimal as type definitions don't affect runtime behavior.",
+          "breakingChanges": [],
+          "ramifications": [
+            "Potential TypeScript compilation improvements or fixes",
+            "May include new type definitions for React features",
+            "Could require minor code adjustments if stricter typing is introduced"
+          ],
+          "changelogUrl": null,
+          "advisories": []
+        },
+        {
+          "packageName": "@types/react-dom",
+          "currentVersion": "19.0.0",
+          "latestVersion": "19.2.3",
+          "updateType": "minor",
+          "riskScore": 15,
+          "recommendation": "THUMBS_UP",
+          "summary": "This is a TypeScript definitions package update with a low risk profile. Since it's a types-only package, it won't affect runtime behavior and minor version updates typically include new type definitions or improvements to existing ones without breaking changes.",
+          "breakingChanges": [],
+          "ramifications": [
+            "May introduce new type definitions for React DOM features",
+            "Could improve type checking accuracy for existing React DOM APIs",
+            "Potential for stricter type checking that might require code adjustments"
+          ],
+          "changelogUrl": null,
           "advisories": []
         },
         {
           "packageName": "eslint",
-          "currentVersion": "10.2.0",
+          "currentVersion": "9.0.0",
           "latestVersion": "10.3.0",
-          "updateType": "minor",
-          "riskScore": 15,
-          "recommendation": "THUMBS_UP",
-          "summary": "This is a low-risk minor update that adds a new feature for suggesting fixes to the no-unused-private-class-members rule and fixes two specific bugs. The changes are primarily additive with targeted bug fixes that improve ESLint's functionality without breaking existing behavior.",
-          "breakingChanges": [],
+          "updateType": "major",
+          "riskScore": 75,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "This is a major version upgrade from ESLint 9.0.0 to 10.3.0 with several bug fixes and feature additions. While the changelog shows mostly maintenance changes and bug fixes, the major version bump suggests potential breaking changes that are not detailed in the provided changelog excerpt.",
+          "breakingChanges": [
+            "Major version upgrade may include breaking changes not listed in this changelog excerpt",
+            "Potential changes to rule behavior or configuration format",
+            "Possible Node.js version requirement changes"
+          ],
           "ramifications": [
-            "New suggestions feature for no-unused-private-class-members rule may provide additional linting feedback",
-            "Bug fix for require cache handling may resolve edge cases in Node.js environments",
-            "Fix for rule suggestions in class bodies may change how certain syntax errors are reported"
+            "May require configuration updates or rule adjustments",
+            "Could break existing linting workflows if breaking changes are present",
+            "New features like suggestions for no-unused-private-class-members may affect code quality checks",
+            "Bug fixes for require cache handling and class body parsing may change linting behavior"
           ],
           "changelogUrl": "https://github.com/eslint/eslint/releases/tag/v10.3.0",
           "advisories": [
@@ -289,25 +474,49 @@
         },
         {
           "packageName": "eslint-config-next",
-          "currentVersion": "16.2.3",
+          "currentVersion": "15.1.0",
           "latestVersion": "16.2.4",
-          "updateType": "patch",
-          "riskScore": 15,
-          "recommendation": "THUMBS_UP",
-          "summary": "This is a patch version update for eslint-config-next with no available changelog information. Patch updates typically contain bug fixes and minor improvements without breaking changes. The risk is minimal for this type of update.",
-          "breakingChanges": [],
+          "updateType": "major",
+          "riskScore": 75,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "This is a major version upgrade from 15.1.0 to 16.2.4 without available changelog information. Major version updates typically introduce breaking changes that could affect ESLint configuration and rule enforcement in Next.js projects.",
+          "breakingChanges": [
+            "Potential ESLint rule changes or removals",
+            "Updated peer dependency requirements",
+            "Modified configuration structure or format",
+            "Changes to supported Next.js versions"
+          ],
           "ramifications": [
-            "Potential minor bug fixes in ESLint configuration rules",
-            "Possible improvements to existing linting rules without breaking existing functionality",
-            "No expected impact on existing code that passes current linting"
+            "Existing ESLint warnings/errors may change or disappear",
+            "New linting errors may be introduced requiring code fixes",
+            "Build process may fail if incompatible with current Next.js version",
+            "Team development workflow may be disrupted by new linting rules",
+            "CI/CD pipelines may break due to stricter or different rule enforcement"
           ],
           "changelogUrl": null,
+          "advisories": []
+        },
+        {
+          "packageName": "tailwindcss",
+          "currentVersion": "4.0.0",
+          "latestVersion": "4.2.4",
+          "updateType": "minor",
+          "riskScore": 15,
+          "recommendation": "THUMBS_UP",
+          "summary": "This is a minor version update that appears to contain only bug fixes related to import resolution in Vite environments. The fix addresses a specific issue with @import and @plugin directives when using Vite aliases, which improves compatibility rather than introducing new functionality or breaking changes.",
+          "breakingChanges": [],
+          "ramifications": [
+            "Improved import resolution when using Vite aliases with @tailwindcss/vite plugin",
+            "Better compatibility between TailwindCSS and Vite-based build systems",
+            "May resolve build issues for projects using custom Vite alias configurations"
+          ],
+          "changelogUrl": "https://github.com/tailwindlabs/tailwindcss/releases/tag/v4.2.4",
           "advisories": []
         }
       ],
       "pr": {
-        "number": 12,
-        "url": "https://github.com/tomd0627/ui-roaster/pull/12",
+        "number": 4,
+        "url": "https://github.com/tomd0627/sitecore-migration-simulator/pull/4",
         "status": "open"
       }
     }
