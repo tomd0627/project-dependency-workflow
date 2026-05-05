@@ -55,7 +55,7 @@ async function findApprovedRepos(octokit) {
   // Omit author: — issues may be created by github-actions[bot] or the PAT
   // user depending on which secret is in use. Scope to the authenticated
   // user's repos with user: instead, then filter by title prefix in code.
-  const query = `is:issue label:${PR.LABELS[0]} label:${PR.LABELS[1]} user:${me}`;
+  const query = `is:issue is:open label:${PR.LABELS[0]} label:${PR.LABELS[1]} user:${me}`;
   logger.info({ me, query }, "Searching for dep-bot issues");
 
   const { data: searchResult } = await octokit.rest.search.issuesAndPullRequests({

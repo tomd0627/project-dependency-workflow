@@ -45,7 +45,8 @@ jobs:
       - name: Commit run report for dashboard
         id: commit_report
         run: |
-          if [ -f ".cache/run-report.json" ]; then
+          REPO_COUNT=$(jq '.repositories | length' .cache/run-report.json 2>/dev/null || echo 0)
+          if [ -f ".cache/run-report.json" ] && [ "$REPO_COUNT" -gt 0 ]; then
             mkdir -p dashboard/public
             cp .cache/run-report.json dashboard/public/run-report.json
             git config user.name "Dep Bot"
