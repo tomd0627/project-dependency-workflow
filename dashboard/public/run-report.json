@@ -1,5 +1,613 @@
 {
-  "runAt": "2026-05-05T14:03:14.082Z",
-  "durationSeconds": 3.2,
-  "repositories": []
+  "runAt": "2026-05-05T15:42:25.128Z",
+  "durationSeconds": 207.6,
+  "repositories": [
+    {
+      "name": "tomd0627/audio-visualizer",
+      "ecosystem": "node",
+      "updates": [
+        {
+          "packageName": "react-router-dom",
+          "currentVersion": "7.14.2",
+          "latestVersion": "7.15.0",
+          "updateType": "minor",
+          "riskScore": 25,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "This is a minor version update for react-router-dom with no provided changelog information. While minor updates typically contain new features and improvements without breaking changes, the lack of changelog details makes it difficult to assess potential impacts. Given the critical nature of routing in React applications, cautious evaluation is recommended.",
+          "breakingChanges": [],
+          "ramifications": [
+            "Potential new features or API additions that may require code updates to utilize",
+            "Possible bug fixes that could change existing behavior in edge cases",
+            "Updates to internal routing logic that might affect application navigation flow"
+          ],
+          "changelogUrl": null,
+          "advisories": []
+        }
+      ],
+      "pr": {
+        "number": 15,
+        "url": "https://github.com/tomd0627/audio-visualizer/pull/15",
+        "status": "open"
+      }
+    },
+    {
+      "name": "tomd0627/codex-machina",
+      "ecosystem": "node",
+      "updates": [
+        {
+          "packageName": "stylelint",
+          "currentVersion": "17.10.0",
+          "latestVersion": "17.11.0",
+          "updateType": "minor",
+          "riskScore": 15,
+          "recommendation": "THUMBS_UP",
+          "summary": "This is a minor version update that adds two new features without removing or modifying existing functionality. The changes include a `loader` property for experimental `referenceFiles` configuration and an `autofixed` property in result objects, both of which are additive enhancements.",
+          "breakingChanges": [],
+          "ramifications": [
+            "New `loader` property available in experimental `referenceFiles` configuration may affect advanced users already using this experimental feature",
+            "Result objects now include `autofixed` property which could impact code that processes stylelint results",
+            "No functional changes to existing linting rules or core behavior expected"
+          ],
+          "changelogUrl": "https://github.com/stylelint/stylelint/releases/tag/17.11.0",
+          "advisories": [
+            {
+              "ghsaId": "GHSA-f7xj-rg7h-mc87",
+              "severity": "LOW",
+              "summary": "Stylelint has vulnerability in semver dependency",
+              "affectedRange": ">= 8.0.0, < 15.10.1",
+              "patchedVersion": "15.10.1",
+              "packageName": "stylelint"
+            }
+          ]
+        }
+      ],
+      "pr": {
+        "number": 2,
+        "url": "https://github.com/tomd0627/codex-machina/pull/2",
+        "status": "open"
+      }
+    },
+    {
+      "name": "tomd0627/component-playground",
+      "ecosystem": "node",
+      "updates": [
+        {
+          "packageName": "react-router-dom",
+          "currentVersion": "7.14.2",
+          "latestVersion": "7.15.0",
+          "updateType": "minor",
+          "riskScore": 25,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "This is a minor version update for react-router-dom with no provided changelog information. While minor updates typically contain new features and improvements without breaking changes, the lack of changelog details makes it difficult to assess potential impacts. Given the critical nature of routing in React applications, cautious evaluation is recommended.",
+          "breakingChanges": [],
+          "ramifications": [
+            "Potential new features or API additions that may require code updates to utilize",
+            "Possible bug fixes that could change existing behavior in edge cases",
+            "Updates to internal routing logic that might affect application navigation flow"
+          ],
+          "changelogUrl": null,
+          "advisories": []
+        }
+      ],
+      "pr": {
+        "number": 14,
+        "url": "https://github.com/tomd0627/component-playground/pull/14",
+        "status": "open"
+      }
+    },
+    {
+      "name": "tomd0627/content-blog",
+      "ecosystem": "node",
+      "updates": [
+        {
+          "packageName": "@portabletext/react",
+          "currentVersion": "6.0.3",
+          "latestVersion": "6.1.0",
+          "updateType": "minor",
+          "riskScore": 15,
+          "recommendation": "THUMBS_UP",
+          "summary": "This minor update adds support for null/undefined values in the value prop, improving TypeScript compatibility with Sanity TypeGen. The change is additive and backward compatible, only extending existing functionality without breaking current usage patterns.",
+          "breakingChanges": [],
+          "ramifications": [
+            "Improved TypeScript experience when using with Sanity TypeGen",
+            "More flexible prop handling for null/undefined values",
+            "Potential for cleaner code when dealing with optional portable text content"
+          ],
+          "changelogUrl": "https://github.com/portabletext/react-portabletext/releases/tag/v6.1.0",
+          "advisories": []
+        },
+        {
+          "packageName": "@sanity/client",
+          "currentVersion": "7.20.0",
+          "latestVersion": "7.22.0",
+          "updateType": "minor",
+          "riskScore": 15,
+          "recommendation": "THUMBS_UP",
+          "summary": "This minor version update adds a new feature to expose trace IDs from backend responses in error handling. The change appears to be additive and focused on improving error diagnostics without modifying existing functionality.",
+          "breakingChanges": [],
+          "ramifications": [
+            "Error objects may now include additional trace ID information from backend responses",
+            "Enhanced debugging capabilities for tracking requests through Sanity's backend systems",
+            "Potential minor changes to error object structure, though likely backwards compatible"
+          ],
+          "changelogUrl": "https://github.com/sanity-io/client/compare/v7.21.0...v7.22.0",
+          "advisories": []
+        },
+        {
+          "packageName": "lucide-react",
+          "currentVersion": "1.7.0",
+          "latestVersion": "1.14.0",
+          "updateType": "minor",
+          "riskScore": 15,
+          "recommendation": "THUMBS_UP",
+          "summary": "This is a minor version update for lucide-react that adds a new 'repeat-off' icon. The change is additive only and poses minimal risk to existing implementations.",
+          "breakingChanges": [],
+          "ramifications": [
+            "New icon 'repeat-off' becomes available for use",
+            "Bundle size may increase slightly due to additional icon",
+            "No impact on existing icon usage or API"
+          ],
+          "changelogUrl": "https://github.com/lucide-icons/lucide/compare/1.13.0...1.14.0",
+          "advisories": []
+        },
+        {
+          "packageName": "next",
+          "currentVersion": "16.2.2",
+          "latestVersion": "16.2.4",
+          "updateType": "patch",
+          "riskScore": 15,
+          "recommendation": "THUMBS_UP",
+          "summary": "This is a patch version update for Next.js from 16.2.2 to 16.2.4, which typically contains bug fixes and security patches. Since no changelog was provided, the risk assessment is based on the patch-level nature of the update, which generally has low risk.",
+          "breakingChanges": [],
+          "ramifications": [
+            "Potential bug fixes that may alter existing behavior slightly",
+            "Possible dependency updates that could affect build or runtime",
+            "Minor performance improvements or optimizations"
+          ],
+          "changelogUrl": null,
+          "advisories": [
+            {
+              "ghsaId": "GHSA-q4gf-8mx6-v5v3",
+              "severity": "HIGH",
+              "summary": "Next.js has a Denial of Service with Server Components",
+              "affectedRange": ">= 16.0.0-beta.0, < 16.2.3",
+              "patchedVersion": "16.2.3",
+              "packageName": "next"
+            },
+            {
+              "ghsaId": "GHSA-q4gf-8mx6-v5v3",
+              "severity": "HIGH",
+              "summary": "Next.js has a Denial of Service with Server Components",
+              "affectedRange": ">= 13.0.0, < 15.5.15",
+              "patchedVersion": "15.5.15",
+              "packageName": "next"
+            },
+            {
+              "ghsaId": "GHSA-5f7q-jpqc-wp7h",
+              "severity": "MODERATE",
+              "summary": "Next.js has Unbounded Memory Consumption via PPR Resume Endpoint ",
+              "affectedRange": ">= 15.5.1-canary.0, <= 15.5.1-canary.39",
+              "patchedVersion": null,
+              "packageName": "next"
+            },
+            {
+              "ghsaId": "GHSA-5f7q-jpqc-wp7h",
+              "severity": "MODERATE",
+              "summary": "Next.js has Unbounded Memory Consumption via PPR Resume Endpoint ",
+              "affectedRange": ">= 15.4.2-canary.0, <= 15.4.2-canary.56",
+              "patchedVersion": null,
+              "packageName": "next"
+            },
+            {
+              "ghsaId": "GHSA-5f7q-jpqc-wp7h",
+              "severity": "MODERATE",
+              "summary": "Next.js has Unbounded Memory Consumption via PPR Resume Endpoint ",
+              "affectedRange": ">= 15.4.0-canary.0, <= 15.4.0-canary.130",
+              "patchedVersion": null,
+              "packageName": "next"
+            },
+            {
+              "ghsaId": "GHSA-5f7q-jpqc-wp7h",
+              "severity": "MODERATE",
+              "summary": "Next.js has Unbounded Memory Consumption via PPR Resume Endpoint ",
+              "affectedRange": ">= 15.3.1-canary.0, <= 15.3.1-canary.15",
+              "patchedVersion": null,
+              "packageName": "next"
+            },
+            {
+              "ghsaId": "GHSA-5f7q-jpqc-wp7h",
+              "severity": "MODERATE",
+              "summary": "Next.js has Unbounded Memory Consumption via PPR Resume Endpoint ",
+              "affectedRange": ">= 15.3.0-canary.0, <= 15.3.0-canary.46",
+              "patchedVersion": null,
+              "packageName": "next"
+            },
+            {
+              "ghsaId": "GHSA-5f7q-jpqc-wp7h",
+              "severity": "MODERATE",
+              "summary": "Next.js has Unbounded Memory Consumption via PPR Resume Endpoint ",
+              "affectedRange": ">= 15.2.2-canary.0, <= 15.2.2-canary.7",
+              "patchedVersion": null,
+              "packageName": "next"
+            },
+            {
+              "ghsaId": "GHSA-5f7q-jpqc-wp7h",
+              "severity": "MODERATE",
+              "summary": "Next.js has Unbounded Memory Consumption via PPR Resume Endpoint ",
+              "affectedRange": ">= 15.2.1-canary.0, <= 15.2.1-canary.6",
+              "patchedVersion": null,
+              "packageName": "next"
+            },
+            {
+              "ghsaId": "GHSA-5f7q-jpqc-wp7h",
+              "severity": "MODERATE",
+              "summary": "Next.js has Unbounded Memory Consumption via PPR Resume Endpoint ",
+              "affectedRange": ">= 15.2.0-canary.0, <= 15.2.0-canary.77",
+              "patchedVersion": null,
+              "packageName": "next"
+            },
+            {
+              "ghsaId": "GHSA-5f7q-jpqc-wp7h",
+              "severity": "MODERATE",
+              "summary": "Next.js has Unbounded Memory Consumption via PPR Resume Endpoint ",
+              "affectedRange": ">= 15.1.1-canary.0, <= 15.1.1-canary.27",
+              "patchedVersion": null,
+              "packageName": "next"
+            },
+            {
+              "ghsaId": "GHSA-5f7q-jpqc-wp7h",
+              "severity": "MODERATE",
+              "summary": "Next.js has Unbounded Memory Consumption via PPR Resume Endpoint ",
+              "affectedRange": ">= 15.0.4-canary.0, <= 15.0.4-canary.52",
+              "patchedVersion": null,
+              "packageName": "next"
+            },
+            {
+              "ghsaId": "GHSA-5f7q-jpqc-wp7h",
+              "severity": "MODERATE",
+              "summary": "Next.js has Unbounded Memory Consumption via PPR Resume Endpoint ",
+              "affectedRange": ">= 15.0.3-canary.0, <= 15.0.3-canary.9",
+              "patchedVersion": null,
+              "packageName": "next"
+            },
+            {
+              "ghsaId": "GHSA-5f7q-jpqc-wp7h",
+              "severity": "MODERATE",
+              "summary": "Next.js has Unbounded Memory Consumption via PPR Resume Endpoint ",
+              "affectedRange": ">= 15.0.2-canary.0, <= 15.0.2-canary.11",
+              "patchedVersion": null,
+              "packageName": "next"
+            },
+            {
+              "ghsaId": "GHSA-5f7q-jpqc-wp7h",
+              "severity": "MODERATE",
+              "summary": "Next.js has Unbounded Memory Consumption via PPR Resume Endpoint ",
+              "affectedRange": ">= 15.0.1-canary.0, <= 15.0.1-canary.3",
+              "patchedVersion": null,
+              "packageName": "next"
+            },
+            {
+              "ghsaId": "GHSA-5f7q-jpqc-wp7h",
+              "severity": "MODERATE",
+              "summary": "Next.js has Unbounded Memory Consumption via PPR Resume Endpoint ",
+              "affectedRange": ">= 15.0.0-canary.0, <= 15.0.0-canary.205",
+              "patchedVersion": null,
+              "packageName": "next"
+            },
+            {
+              "ghsaId": "GHSA-3x4c-7xq6-9pq8",
+              "severity": "MODERATE",
+              "summary": "Next.js: Unbounded next/image disk cache growth can exhaust storage",
+              "affectedRange": ">= 10.0.0, < 15.5.14",
+              "patchedVersion": "15.5.14",
+              "packageName": "next"
+            },
+            {
+              "ghsaId": "GHSA-3x4c-7xq6-9pq8",
+              "severity": "MODERATE",
+              "summary": "Next.js: Unbounded next/image disk cache growth can exhaust storage",
+              "affectedRange": ">= 16.0.0-beta.0, < 16.1.7",
+              "patchedVersion": "16.1.7",
+              "packageName": "next"
+            },
+            {
+              "ghsaId": "GHSA-ggv3-7p47-pfv8",
+              "severity": "MODERATE",
+              "summary": "Next.js: HTTP request smuggling in rewrites",
+              "affectedRange": ">= 9.5.0, < 15.5.13",
+              "patchedVersion": "15.5.13",
+              "packageName": "next"
+            },
+            {
+              "ghsaId": "GHSA-ggv3-7p47-pfv8",
+              "severity": "MODERATE",
+              "summary": "Next.js: HTTP request smuggling in rewrites",
+              "affectedRange": ">= 16.0.0-beta.0, < 16.1.7",
+              "patchedVersion": "16.1.7",
+              "packageName": "next"
+            }
+          ]
+        },
+        {
+          "packageName": "react",
+          "currentVersion": "19.2.4",
+          "latestVersion": "19.2.5",
+          "updateType": "patch",
+          "riskScore": 15,
+          "recommendation": "THUMBS_UP",
+          "summary": "This is a low-risk patch release that adds cycle protection improvements to React Server Components. The changes are internal stability improvements that enhance error handling without affecting the public API.",
+          "breakingChanges": [],
+          "ramifications": [
+            "Improved cycle detection in React Server Components may prevent infinite loops",
+            "Better error handling for circular dependencies in server-side rendering",
+            "Internal stability improvements with no expected user-facing changes"
+          ],
+          "changelogUrl": "https://github.com/facebook/react/releases/tag/v19.2.5",
+          "advisories": [
+            {
+              "ghsaId": "GHSA-hg79-j56m-fxgv",
+              "severity": "HIGH",
+              "summary": "Cross-Site Scripting in react",
+              "affectedRange": ">= 0.0.1, < 0.14.0",
+              "patchedVersion": "0.14.0",
+              "packageName": "react"
+            },
+            {
+              "ghsaId": "GHSA-g53w-52xc-2j85",
+              "severity": "MODERATE",
+              "summary": "Cross-Site Scripting in react",
+              "affectedRange": ">= 0.5.0, < 0.5.2",
+              "patchedVersion": "0.5.2",
+              "packageName": "react"
+            },
+            {
+              "ghsaId": "GHSA-g53w-52xc-2j85",
+              "severity": "MODERATE",
+              "summary": "Cross-Site Scripting in react",
+              "affectedRange": ">= 0.4.0, < 0.4.2",
+              "patchedVersion": "0.4.2",
+              "packageName": "react"
+            }
+          ]
+        },
+        {
+          "packageName": "react-dom",
+          "currentVersion": "19.2.4",
+          "latestVersion": "19.2.5",
+          "updateType": "patch",
+          "riskScore": 15,
+          "recommendation": "THUMBS_UP",
+          "summary": "This is a low-risk patch release that adds cycle protection improvements to React Server Components. The changes are focused on preventing infinite loops or circular references, which is a stability enhancement rather than a breaking change.",
+          "breakingChanges": [],
+          "ramifications": [
+            "Improved stability in React Server Components by preventing cycles",
+            "Better error handling for circular reference scenarios",
+            "No API changes or behavioral modifications for existing code"
+          ],
+          "changelogUrl": "https://github.com/facebook/react/releases/tag/v19.2.5",
+          "advisories": [
+            {
+              "ghsaId": "GHSA-mvjj-gqq2-p4hw",
+              "severity": "MODERATE",
+              "summary": "Cross-Site Scripting in react-dom",
+              "affectedRange": ">= 16.4.0, < 16.4.2",
+              "patchedVersion": "16.4.2",
+              "packageName": "react-dom"
+            },
+            {
+              "ghsaId": "GHSA-mvjj-gqq2-p4hw",
+              "severity": "MODERATE",
+              "summary": "Cross-Site Scripting in react-dom",
+              "affectedRange": ">= 16.3.0, < 16.3.3",
+              "patchedVersion": "16.3.3",
+              "packageName": "react-dom"
+            },
+            {
+              "ghsaId": "GHSA-mvjj-gqq2-p4hw",
+              "severity": "MODERATE",
+              "summary": "Cross-Site Scripting in react-dom",
+              "affectedRange": "= 16.2.0",
+              "patchedVersion": "16.2.1",
+              "packageName": "react-dom"
+            },
+            {
+              "ghsaId": "GHSA-mvjj-gqq2-p4hw",
+              "severity": "MODERATE",
+              "summary": "Cross-Site Scripting in react-dom",
+              "affectedRange": ">= 16.1.0, < 16.1.2",
+              "patchedVersion": "16.1.2",
+              "packageName": "react-dom"
+            },
+            {
+              "ghsaId": "GHSA-mvjj-gqq2-p4hw",
+              "severity": "MODERATE",
+              "summary": "Cross-Site Scripting in react-dom",
+              "affectedRange": "= 16.0.0",
+              "patchedVersion": "16.0.1",
+              "packageName": "react-dom"
+            }
+          ]
+        },
+        {
+          "packageName": "@netlify/plugin-nextjs",
+          "currentVersion": "5.15.9",
+          "latestVersion": "5.15.10",
+          "updateType": "patch",
+          "riskScore": 15,
+          "recommendation": "THUMBS_UP",
+          "summary": "This is a low-risk patch release containing two bug fixes related to URL rewriting and caching behavior. The changes fix edge cases around response header handling and cache tag setting for redirects, which should improve reliability without introducing breaking changes.",
+          "breakingChanges": [],
+          "ramifications": [
+            "URL rewrites with response headers will no longer be incorrectly optimized",
+            "Cache tags will now be properly set for getStaticProps redirects",
+            "May result in slight performance changes for affected rewrite scenarios"
+          ],
+          "changelogUrl": "https://github.com/opennextjs/opennextjs-netlify/compare/v5.15.9...v5.15.10",
+          "advisories": []
+        },
+        {
+          "packageName": "@next/bundle-analyzer",
+          "currentVersion": "16.2.2",
+          "latestVersion": "16.2.4",
+          "updateType": "patch",
+          "riskScore": 15,
+          "recommendation": "THUMBS_UP",
+          "summary": "This is a patch-level update for Next.js bundle analyzer with no provided changelog details. Patch updates typically contain bug fixes and minor improvements without breaking changes. The low version increment suggests minimal risk.",
+          "breakingChanges": [],
+          "ramifications": [
+            "Potential bug fixes and performance improvements",
+            "May include security patches or dependency updates",
+            "Could affect bundle analysis output format or accuracy"
+          ],
+          "changelogUrl": null,
+          "advisories": []
+        },
+        {
+          "packageName": "@types/node",
+          "currentVersion": "25.5.2",
+          "latestVersion": "25.6.0",
+          "updateType": "minor",
+          "riskScore": 15,
+          "recommendation": "THUMBS_UP",
+          "summary": "This is a minor version update to TypeScript definitions for Node.js with no changelog provided. Type definition packages typically have low risk as they don't affect runtime behavior, only compile-time type checking. The minor version bump suggests new type definitions or improvements without breaking existing ones.",
+          "breakingChanges": [],
+          "ramifications": [
+            "Potential new TypeScript type definitions for newer Node.js features",
+            "Possible improved type accuracy for existing Node.js APIs",
+            "May require TypeScript recompilation but no runtime changes expected"
+          ],
+          "changelogUrl": null,
+          "advisories": []
+        },
+        {
+          "packageName": "@typescript-eslint/eslint-plugin",
+          "currentVersion": "8.58.0",
+          "latestVersion": "8.59.2",
+          "updateType": "minor",
+          "riskScore": 15,
+          "recommendation": "THUMBS_UP",
+          "summary": "This is a low-risk minor update containing only bug fixes for ESLint rules. The changes address crashes and incorrect behavior in specific rules without introducing new features or breaking changes.",
+          "breakingChanges": [],
+          "ramifications": [
+            "Fixed crash in no-unsafe-type-assertion rule when handling recursive template literal types",
+            "Corrected no-deprecated rule behavior for object destructuring patterns",
+            "Added TypeScript as peer dependency to rule-tester package"
+          ],
+          "changelogUrl": "https://github.com/typescript-eslint/typescript-eslint/releases/tag/v8.59.2",
+          "advisories": []
+        },
+        {
+          "packageName": "@typescript-eslint/parser",
+          "currentVersion": "8.58.0",
+          "latestVersion": "8.59.2",
+          "updateType": "minor",
+          "riskScore": 15,
+          "recommendation": "THUMBS_UP",
+          "summary": "This is a low-risk patch release focused on bug fixes for ESLint rules. The changes address specific crashes and improve rule behavior without introducing breaking changes.",
+          "breakingChanges": [],
+          "ramifications": [
+            "Fixed crash in no-unsafe-type-assertion rule when handling recursive template literal types",
+            "Improved no-deprecated rule to properly handle object destructuring declarations",
+            "Added TypeScript as peer dependency for rule-tester package"
+          ],
+          "changelogUrl": "https://github.com/typescript-eslint/typescript-eslint/releases/tag/v8.59.2",
+          "advisories": []
+        },
+        {
+          "packageName": "eslint",
+          "currentVersion": "10.2.0",
+          "latestVersion": "10.3.0",
+          "updateType": "minor",
+          "riskScore": 15,
+          "recommendation": "THUMBS_UP",
+          "summary": "This is a low-risk minor update that primarily includes bug fixes and a new feature for rule suggestions. The changes focus on improving error handling and fixing issues with class body parsing, which should enhance stability without breaking existing functionality.",
+          "breakingChanges": [],
+          "ramifications": [
+            "New suggestion feature for no-unused-private-class-members rule may change linting output",
+            "Improved error handling for unavailable require cache scenarios",
+            "Fixed rule suggestions behavior in class bodies may change parsing results in edge cases"
+          ],
+          "changelogUrl": "https://github.com/eslint/eslint/releases/tag/v10.3.0",
+          "advisories": [
+            {
+              "ghsaId": "GHSA-p5wg-g6qr-c7cg",
+              "severity": "MODERATE",
+              "summary": "Withdrawn Advisory: eslint has a Stack Overflow when serializing objects with circular references",
+              "affectedRange": "< 9.26.0",
+              "patchedVersion": "9.26.0",
+              "packageName": "eslint"
+            },
+            {
+              "ghsaId": "GHSA-jcgq-xh2f-2hfm",
+              "severity": "MODERATE",
+              "summary": "Regular Expression Denial of Service",
+              "affectedRange": "< 4.18.2",
+              "patchedVersion": "4.18.2",
+              "packageName": "eslint"
+            }
+          ]
+        },
+        {
+          "packageName": "eslint-config-next",
+          "currentVersion": "16.2.2",
+          "latestVersion": "16.2.4",
+          "updateType": "patch",
+          "riskScore": 15,
+          "recommendation": "THUMBS_UP",
+          "summary": "This is a patch version update for eslint-config-next with no provided changelog information. Patch updates typically contain bug fixes and minor improvements without breaking changes. The risk is low given the semantic versioning convention and the nature of ESLint configuration packages.",
+          "breakingChanges": [],
+          "ramifications": [
+            "Possible minor rule adjustments or bug fixes in ESLint configuration",
+            "Potential updates to underlying ESLint rule dependencies",
+            "May require running linter again to see any new rule enforcement"
+          ],
+          "changelogUrl": null,
+          "advisories": []
+        },
+        {
+          "packageName": "sanity",
+          "currentVersion": "5.19.0",
+          "latestVersion": "5.24.0",
+          "updateType": "minor",
+          "riskScore": 25,
+          "recommendation": "THUMBS_UP",
+          "summary": "This is a minor version update for Sanity Studio containing various improvements and bug fixes. The changes are primarily focused on internal improvements, dependency updates, and non-breaking feature additions like making document action keys extensible via declaration merging.",
+          "breakingChanges": [],
+          "ramifications": [
+            "Document action keys become extensible via declaration merging which may affect TypeScript type definitions",
+            "Internal workspace hidden property restoration may change workspace behavior",
+            "Calendar focused date reset behavior has been modified",
+            "Various chore updates including pnpm upgrade to 11.0.0 and tooling changes"
+          ],
+          "changelogUrl": "https://www.sanity.io/changelog/studio-NS4yMy4w",
+          "advisories": []
+        }
+      ],
+      "pr": null
+    },
+    {
+      "name": "tomd0627/finance-app-claude",
+      "ecosystem": "node",
+      "updates": [
+        {
+          "packageName": "@biomejs/biome",
+          "currentVersion": "2.4.11",
+          "latestVersion": "2.4.14",
+          "updateType": "patch",
+          "riskScore": 25,
+          "recommendation": "NEEDS_REVIEW",
+          "summary": "This is a patch version update from 2.4.11 to 2.4.14 for Biome, a code formatter and linter. Without access to the specific changelog, the risk is moderate as patch versions typically contain bug fixes but could include behavior changes in formatting or linting rules.",
+          "breakingChanges": [],
+          "ramifications": [
+            "Potential changes in code formatting output that may affect code review diffs",
+            "Possible new linting rules or modifications to existing rules",
+            "Bug fixes that might change previously accepted code patterns"
+          ],
+          "changelogUrl": null,
+          "advisories": []
+        }
+      ],
+      "pr": null
+    }
+  ]
 }
