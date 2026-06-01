@@ -100,6 +100,35 @@ export async function detectTestCommand(repoPath) {
 }
 
 /**
+ * Detects a fast static-check command suitable for verifying that source files
+ * are syntactically/semantically valid without needing a running server or
+ * browser binaries. Prefers lint → typecheck → build, in that order.
+ * Returns null when no recognised script is found.
+ *
+ * This is intentionally lighter than detectTestCommand — it is used by the
+ * autofixer loop, where the goal is quick feedback, not full test coverage.
+ *
+ * @param {string} repoPath - Local path to the repository
+ * @returns {Promise<string | null>}
+ */
+export async function detectStaticCheckCommand(repoPath) {
+  try {
+    const raw = await readFile(join(repoPath, "package.json"), "utf8");
+    const pkg = JSON.parse(raw);
+    const scripts = pkg.scripts ?? {};
+    for (const name of ["lint", "typecheck", "type-check", "check", "build"]) {
+      if (scripts[name]) {
+        logger.debug({ repoPath, script: name }, "Detected static-check script");
+        return `npm run ${name}`;
+      }
+    }
+  } catch {
+    // No package.json or parse error — no static check available.
+  }
+  return null;
+}
+
+/**
  * Checks whether a Node.js repository has a build script and returns the
  * command to run it. Returns null if no build script is defined.
  *

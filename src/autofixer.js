@@ -24,12 +24,12 @@ const DEFAULT_MAX_ATTEMPTS = 3;
  * @returns {string}
  */
 function buildFixPrompt(failureOutput, patchDiff) {
-  return `You are a code repair assistant. A dependency update caused automated test failures.
+  return `You are a code repair assistant. A dependency update caused automated check failures.
 
 APPLIED DIFF (the dependency change that broke things):
 ${patchDiff}
 
-TEST FAILURE OUTPUT:
+FAILURE OUTPUT:
 ${failureOutput}
 
 Analyse the failure and return ONLY a JSON array of file changes required to fix it.
@@ -38,7 +38,8 @@ Each element must have this shape: { "file": "relative/path/from/repo/root", "co
 Rules:
 - Return ONLY valid JSON — no markdown fences, no commentary.
 - If you cannot determine a safe fix, return an empty array: []
-- Keep changes minimal; prefer fixing call-sites over rewriting entire files.`;
+- Keep changes minimal; prefer fixing call-sites over rewriting entire files.
+- NEVER modify package.json, package-lock.json, yarn.lock, pnpm-lock.yaml, or any other dependency manifest or lockfile. Version management is handled separately. Return [] if the only fix would touch these files.`;
 }
 
 /**
@@ -53,8 +54,7 @@ Rules:
 async function suggestFixes(client, failureOutput, patchDiff) {
   const msg = await client.messages.create({
     model: API.CLAUDE_MODEL,
-    // Fixes may include full file rewrites — allow more tokens than a summary.
-    max_tokens: API.CLAUDE_MAX_TOKENS * 4,
+    max_tokens: API.CLAUDE_MAX_TOKENS * 2,
     messages: [{ role: "user", content: buildFixPrompt(failureOutput, patchDiff) }],
   });
 
@@ -72,13 +72,21 @@ async function suggestFixes(client, failureOutput, patchDiff) {
   }
 }
 
-/**
- * Applies a list of file changes to the repository.
- * @param {string} repoPath
- * @param {Array<{ file: string, content: string }>} changes
- */
+/** Files the autofixer must never overwrite — version management is the updater's job. */
+const PROTECTED_FILES = new Set([
+  "package.json",
+  "package-lock.json",
+  "yarn.lock",
+  "pnpm-lock.yaml",
+  "npm-shrinkwrap.json",
+]);
+
 async function applyChanges(repoPath, changes) {
   for (const { file, content } of changes) {
+    if (PROTECTED_FILES.has(file.split("/").at(-1))) {
+      logger.warn({ file }, "Autofix: skipping protected file");
+      continue;
+    }
     const fullPath = `${repoPath}/${file}`;
     await writeFile(fullPath, content, "utf8");
     logger.debug({ file }, "Autofix: wrote file");
@@ -116,7 +124,9 @@ async function runTests(repoPath, testCommand) {
  * @param {string} params.failureOutput - Test failure stdout/stderr
  * @param {string} params.patchDiff - The diff applied by the updater
  * @param {number} [params.maxAttempts]
- * @param {string} [params.testCommand] - Test command to run (default: 'npm test')
+ * @param {string} [params.testCommand] - Fast static-check command used to verify fixes
+ *   (e.g. 'npm run lint'). Prefer detectStaticCheckCommand() from qa.js over a full
+ *   test suite — E2E/browser tests cannot pass in a headless bot environment.
  * @returns {Promise<{ fixed: boolean; attempts: number; trace: string[] }>}
  */
 export async function autofixRegressions({
@@ -125,7 +135,7 @@ export async function autofixRegressions({
   failureOutput,
   patchDiff,
   maxAttempts = DEFAULT_MAX_ATTEMPTS,
-  testCommand = "npm test",
+  testCommand = "npm run lint",
 }) {
   const trace = [];
   let currentFailure = failureOutput;
