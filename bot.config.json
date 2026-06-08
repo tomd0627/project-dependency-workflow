@@ -27,8 +27,6 @@
   "scan_ecosystems": ["node"],
   "repo_concurrency": 5,
   "held_packages": {
-    "typescript": "< 6",
-    "sass": "< 1.99",
-    "lucide": "< 1.7"
+    "sass": "< 2"
   }
 }
