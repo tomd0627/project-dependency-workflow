@@ -24,6 +24,7 @@ import {
   CACHE,
   DRY_RUN_PREFIX,
   GATE,
+  NOTIFIER,
   RECOMMENDATION,
   RISK_THRESHOLD,
   STAGE,
@@ -441,6 +442,41 @@ async function processEcosystem({ octokit, client, token, owner, repo, scanResul
   return { name: `${owner}/${repo}`, ecosystem, updates: enrichedUpdates, pr: prEntry };
 }
 
+// ── PAT expiry check ───────────────────────────────────────────────────────────
+
+/**
+ * Reads the token expiry date from the PAT_EXPIRY_DATE environment variable and
+ * fires a warning notification if expiry is within NOTIFIER.PAT_EXPIRY_WARN_DAYS
+ * days. Set PAT_EXPIRY_DATE (e.g. "2026-06-29") as a GitHub Actions secret and
+ * update it each time a new PAT is created.
+ * Non-fatal — a broken pre-flight must never block the pipeline.
+ *
+ * @param {object} params
+ * @param {string | undefined} params.discordWebhook
+ * @param {string | undefined} params.ntfyTopic
+ */
+async function checkTokenExpiry({ discordWebhook, ntfyTopic }) {
+  const patExpiry = process.env.PAT_EXPIRY_DATE;
+  if (!patExpiry) return;
+
+  const expiryDate = new Date(patExpiry);
+  if (Number.isNaN(expiryDate.getTime())) {
+    logger.warn({ patExpiry }, "PAT_EXPIRY_DATE is not a valid date — skipping check");
+    return;
+  }
+
+  const daysUntilExpiry = Math.ceil((expiryDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+
+  if (daysUntilExpiry > NOTIFIER.PAT_EXPIRY_WARN_DAYS) return;
+
+  const message = daysUntilExpiry <= 0
+    ? `⚠️ dep-bot: GitHub token has EXPIRED. The pipeline will fail on the next run. Generate a new PAT at github.com/settings/tokens and update the GH_PAT secret in project-dependency-workflow Actions secrets.`
+    : `⚠️ dep-bot: GitHub token expires in ${daysUntilExpiry} day${daysUntilExpiry === 1 ? "" : "s"} (${expiryDate.toDateString()}). Generate a new PAT at github.com/settings/tokens and update the GH_PAT secret in project-dependency-workflow Actions secrets.`;
+
+  logger.warn({ daysUntilExpiry, expiryDate: expiryDate.toISOString() }, "GitHub token expiry warning sent");
+  await sendWebhookNotification({ discordWebhook, ntfyTopic, message });
+}
+
 // ── Main orchestrator ──────────────────────────────────────────────────────────
 
 /**
@@ -467,6 +503,8 @@ async function run() {
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const discordWebhook = process.env.DISCORD_WEBHOOK || undefined;
   const ntfyTopic = process.env.NTFY_TOPIC || undefined;
+
+  await checkTokenExpiry({ discordWebhook, ntfyTopic });
 
   // ── DISCOVER ──────────────────────────────────────────────────────────────────
   logger.info({ stage: STAGE.DISCOVER }, "Pipeline starting");

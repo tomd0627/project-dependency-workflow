@@ -65,7 +65,7 @@ export const RISK_THRESHOLD = /** @type {const} */ ({
 
 // ── API configuration ─────────────────────────────────────────────────────────
 export const API = /** @type {const} */ ({
-  CLAUDE_MODEL: "claude-sonnet-4-20250514",
+  CLAUDE_MODEL: "claude-sonnet-4-6",
   CLAUDE_MAX_TOKENS: 1000,
   CLAUDE_TIMEOUT_MS: 30_000,
   GITHUB_GRAPHQL_URL: "https://api.github.com/graphql",
@@ -165,6 +165,8 @@ export const NOTIFIER = /** @type {const} */ ({
   /** Discord enforces a 2 000-character limit on message content. */
   DISCORD_CONTENT_LIMIT: 2_000,
   NTFY_BASE_URL: "https://ntfy.sh",
+  /** Warn this many days before the GitHub token expires. */
+  PAT_EXPIRY_WARN_DAYS: 14,
 });
 
 // ── Dry run ───────────────────────────────────────────────────────────────────

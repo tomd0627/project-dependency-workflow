@@ -98,6 +98,7 @@ flowchart TD
 | `TARGET_REPO` | No | Limit run to a single repository by name or full name (e.g. `my-repo` or `username/my-repo`). |
 | `DRY_RUN` | No | Set to `"true"` to run without making any changes. Overrides `bot.config.json`. |
 | `NOTIFY_USERNAME` | No | GitHub username to @-mention in issue notifications. Falls back to `github_username` in `bot.config.json`. |
+| `PAT_EXPIRY_DATE` | No | Expiry date of the `GH_PAT` token (e.g. `2026-06-29`). When set, the bot sends a Discord/ntfy warning 14 days before expiry. Update alongside `GH_PAT` each time a new token is created. |
 | `LOG_LEVEL` | No | Pino log level. Defaults to `"info"`. |
 
 ---
