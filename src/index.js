@@ -31,7 +31,7 @@ import {
 } from "./constants.js";
 import { createOctokitClient, discoverRepositories } from "./discovery.js";
 import { logger } from "./logger.js";
-import { createReportIssue, sendWebhookNotification } from "./notifier.js";
+import { createReportIssue, sendRunSummary, sendWebhookNotification } from "./notifier.js";
 import { createUpdateBranch, deleteUpdateBranch, openPullRequest } from "./publisher.js";
 import { detectBuildCommand, detectTestCommand, runTestSuite } from "./qa.js";
 import { scanRepository } from "./scanner.js";
@@ -154,12 +154,10 @@ async function removeDir(dir) {
  * @param {string} params.repo
  * @param {import('./scanner.js').ScanResult} params.scanResult
  * @param {object} params.config - bot.config.json values
- * @param {string | undefined} params.discordWebhook - Discord webhook URL (env var takes precedence over config)
- * @param {string | undefined} params.ntfyTopic - ntfy.sh topic name
  * @param {boolean} params.dryRun
  * @returns {Promise<object>} Run-report entry for this (repo, ecosystem) pair
  */
-async function processEcosystem({ octokit, client, token, owner, repo, scanResult, config, discordWebhook, ntfyTopic, dryRun }) {
+async function processEcosystem({ octokit, client, token, owner, repo, scanResult, config, dryRun }) {
   const { ecosystem, outdated } = scanResult;
 
   // ── ANALYZE ──────────────────────────────────────────────────────────────────
@@ -229,18 +227,6 @@ async function processEcosystem({ octokit, client, token, owner, repo, scanResul
 
   const issueResult = await createReportIssue({ octokit, owner, repo, report, dryRun });
 
-  const effectiveDiscord = discordWebhook || config.notification_webhook || undefined;
-  if (effectiveDiscord || ntfyTopic) {
-    const message =
-      `[dep-bot] ${owner}/${repo} (${ecosystem}): ` +
-      `${outdated.length} update(s), ${advisories.length} advisory/advisories`;
-    await sendWebhookNotification({
-      discordWebhook: effectiveDiscord,
-      ntfyTopic,
-      message,
-    });
-  }
-
   // ── GATE ──────────────────────────────────────────────────────────────────────
   // Non-blocking: check once for an existing APPROVE comment. If absent, post
   // the issue and exit immediately — the approve-watcher runs on its own schedule
@@ -261,7 +247,7 @@ async function processEcosystem({ octokit, client, token, owner, repo, scanResul
 
     if (!approved) {
       logger.info({ owner, repo, ecosystem }, "Awaiting approval — issue created, approve-watcher will trigger PR when approved");
-      return { name: `${owner}/${repo}`, ecosystem, updates: enrichedUpdates, pr: null };
+      return { name: `${owner}/${repo}`, ecosystem, updates: enrichedUpdates, pr: null, pipelineStatus: "awaiting_approval" };
     }
 
     logger.info({ owner, repo, ecosystem }, "Prior approval found — proceeding to update");
@@ -401,7 +387,7 @@ async function processEcosystem({ octokit, client, token, owner, repo, scanResul
         logger.warn({ owner, repo, error: err.message }, "Failed to post QA failure comment on issue");
       });
     }
-    return { name: `${owner}/${repo}`, ecosystem, updates: enrichedUpdates, pr: null };
+    return { name: `${owner}/${repo}`, ecosystem, updates: enrichedUpdates, pr: null, pipelineStatus: "qa_failed" };
   }
 
   if (openAsDraft && issueResult && !dryRun) {
@@ -427,6 +413,7 @@ async function processEcosystem({ octokit, client, token, owner, repo, scanResul
     hasSecurityFixes,
     draft: openAsDraft,
     qaFailed: openAsDraft,
+    issueNumber: issueResult?.issueNumber ?? null,
     dryRun,
   });
 
@@ -439,7 +426,7 @@ async function processEcosystem({ octokit, client, token, owner, repo, scanResul
     "Ecosystem processing complete"
   );
 
-  return { name: `${owner}/${repo}`, ecosystem, updates: enrichedUpdates, pr: prEntry };
+  return { name: `${owner}/${repo}`, ecosystem, updates: enrichedUpdates, pr: prEntry, pipelineStatus: openAsDraft ? "draft_pr" : "pr_open" };
 }
 
 // ── PAT expiry check ───────────────────────────────────────────────────────────
@@ -575,8 +562,6 @@ async function run() {
           repo,
           scanResult,
           config,
-          discordWebhook,
-          ntfyTopic,
           dryRun,
         });
         entries.push(entry);
@@ -608,6 +593,16 @@ async function run() {
     logger.info({ path: `${CACHE.DIR}/run-report.json` }, "Run report written");
   } catch (err) {
     logger.warn({ error: err.message }, "Failed to write run report — dashboard will show stale data");
+  }
+
+  if (!dryRun) {
+    const effectiveDiscord = discordWebhook || config.notification_webhook || undefined;
+    await sendRunSummary({
+      runReport,
+      totalReposScanned: repos.length,
+      discordWebhook: effectiveDiscord,
+      ntfyTopic,
+    });
   }
 
   logger.info({ durationSeconds: runReport.durationSeconds }, "Pipeline complete");

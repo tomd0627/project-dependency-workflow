@@ -1,0 +1,78 @@
+name: Bulk Approve
+
+# Comments APPROVE on all open dep-bot issues that do not already have a SKIP
+# comment. The Approval Watcher picks up each approval within 30 minutes and
+# runs the full pipeline to create a PR.
+#
+# To exclude a repo before triggering this workflow, comment SKIP on its issue.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  bulk-approve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Approve all non-skipped dep-bot issues
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          echo "Searching for open dep-bot issues..."
+
+          # Fetch up to 100 open issues with both dep-bot labels across all
+          # repos owned by the authenticated user.
+          issues=$(gh search issues \
+            --label=automated \
+            --label=dependencies \
+            --state=open \
+            --owner=@me \
+            --limit=100 \
+            --json repository,number,title)
+
+          total=$(echo "$issues" | jq 'length')
+          echo "Found $total candidate issue(s)"
+
+          approved=0
+          skipped=0
+          already_approved=0
+
+          while IFS= read -r row; do
+            repo=$(echo "$row" | jq -r '.repository.nameWithOwner')
+            number=$(echo "$row" | jq -r '.number')
+            title=$(echo "$row" | jq -r '.title')
+
+            # Only process issues created by the dep-bot.
+            if [[ "$title" != "deps: dependency update report"* ]]; then
+              continue
+            fi
+
+            # Fetch comments and check for SKIP or existing APPROVE.
+            comments=$(gh api "repos/$repo/issues/$number/comments" --jq '[.[].body | ascii_upcase]')
+
+            if echo "$comments" | jq -e 'any(. | contains("SKIP"))' > /dev/null; then
+              echo "  SKIP   $repo#$number"
+              skipped=$((skipped + 1))
+              continue
+            fi
+
+            if echo "$comments" | jq -e 'any(. | contains("APPROVE"))' > /dev/null; then
+              echo "  ALREADY APPROVED   $repo#$number"
+              already_approved=$((already_approved + 1))
+              continue
+            fi
+
+            gh issue comment "$number" --repo "$repo" --body "approve"
+            echo "  APPROVED   $repo#$number"
+            approved=$((approved + 1))
+
+          done < <(echo "$issues" | jq -c '.[]')
+
+          echo ""
+          echo "Done — approved: $approved | skipped (SKIP): $skipped | already approved: $already_approved"

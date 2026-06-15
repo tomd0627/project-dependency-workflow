@@ -253,3 +253,87 @@ export async function sendWebhookNotification({ discordWebhook, ntfyTopic, messa
 
   await Promise.all(tasks);
 }
+
+// ── Run summary ───────────────────────────────────────────────────────────────
+
+/**
+ * Builds Discord and ntfy summary messages from a completed run report.
+ * Exported for unit testing.
+ *
+ * @param {object} runReport
+ * @param {number} totalReposScanned
+ * @returns {{ discord: string; ntfy: string }}
+ */
+export function buildRunSummary(runReport, totalReposScanned) {
+  const { repositories, durationSeconds, runAt } = runReport;
+
+  const readyToMerge   = repositories.filter((r) => r.pipelineStatus === "pr_open");
+  const awaitApproval  = repositories.filter((r) => r.pipelineStatus === "awaiting_approval");
+  const draftPrs       = repositories.filter((r) => r.pipelineStatus === "draft_pr");
+  const qaFailed       = repositories.filter((r) => r.pipelineStatus === "qa_failed");
+  const needsAttention = [...draftPrs, ...qaFailed];
+
+  const uniqueReposWithUpdates = new Set(repositories.map((r) => r.name)).size;
+  const upToDate = Math.max(0, totalReposScanned - uniqueReposWithUpdates);
+
+  const date = new Date(runAt).toLocaleDateString("en-US", {
+    weekday: "short", month: "short", day: "numeric", year: "numeric",
+  });
+
+  const lines = [`**dep-bot run complete** — ${date} (${durationSeconds}s)`, ""];
+
+  if (readyToMerge.length > 0) {
+    const n = readyToMerge.length;
+    lines.push(`✅ **${n}** PR${n === 1 ? "" : "s"} ready to merge`);
+  }
+  if (awaitApproval.length > 0) {
+    const n = awaitApproval.length;
+    lines.push(`📋 **${n}** issue${n === 1 ? "" : "s"} awaiting approval`);
+  }
+  if (needsAttention.length > 0) {
+    const n = needsAttention.length;
+    lines.push(`⚠️ **${n}** need${n === 1 ? "s" : ""} manual attention:`);
+    for (const r of draftPrs)  lines.push(`  • ${r.name} — draft PR (build failed after major update)`);
+    for (const r of qaFailed)  lines.push(`  • ${r.name} — PR skipped (tests/build failed)`);
+  }
+  if (upToDate > 0) {
+    lines.push(`🟢 ${upToDate} repo${upToDate === 1 ? "" : "s"} up to date`);
+  }
+  if (readyToMerge.length === 0 && awaitApproval.length === 0 && needsAttention.length === 0) {
+    lines.push("🟢 All repos up to date — nothing to do");
+  }
+
+  const discord = lines.join("\n");
+
+  const parts = [];
+  if (readyToMerge.length)   parts.push(`${readyToMerge.length} PR${readyToMerge.length === 1 ? "" : "s"} ready to merge`);
+  if (awaitApproval.length)  parts.push(`${awaitApproval.length} to approve`);
+  if (needsAttention.length) parts.push(`${needsAttention.length} need attention`);
+  if (!parts.length)         parts.push("all repos up to date");
+  const ntfy = `dep-bot: ${parts.join(", ")}`;
+
+  return { discord, ntfy };
+}
+
+/**
+ * Sends the end-of-run summary to Discord (rich format) and/or ntfy (one-liner).
+ *
+ * @param {object} params
+ * @param {object} params.runReport
+ * @param {number} params.totalReposScanned
+ * @param {string | undefined} params.discordWebhook
+ * @param {string | undefined} params.ntfyTopic
+ * @returns {Promise<void>}
+ */
+export async function sendRunSummary({ runReport, totalReposScanned, discordWebhook, ntfyTopic }) {
+  if (!discordWebhook && !ntfyTopic) return;
+
+  const { discord, ntfy } = buildRunSummary(runReport, totalReposScanned);
+
+  if (discordWebhook) {
+    await sendWebhookNotification({ discordWebhook, ntfyTopic: undefined, message: discord });
+  }
+  if (ntfyTopic) {
+    await sendWebhookNotification({ discordWebhook: undefined, ntfyTopic, message: ntfy });
+  }
+}

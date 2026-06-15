@@ -187,6 +187,15 @@ within ~30 minutes**, handled by the Approval Watcher workflow. GitHub Actions j
 cannot block indefinitely waiting for human input, so the watcher runs on a separate
 30-minute schedule to bridge that gap — no manual re-trigger required.
 
+To opt out of a specific repo before approving, comment `SKIP` on its issue. The
+watcher and the Bulk Approve workflow both honor `SKIP` — an issue with a `SKIP`
+comment is never processed, even if it also has an `APPROVE` comment.
+
+For weeks with many open issues, the **Bulk Approve** workflow (`Actions → Bulk Approve
+→ Run workflow`) comments `APPROVE` on every open dep-bot issue that does not have a
+`SKIP` comment. This is equivalent to approving each issue individually and goes
+through the same watcher-to-PR pipeline.
+
 ### Why vanilla JS for the dashboard (vs. React/Vue)?
 
 The dashboard is intentionally framework-free. It is a read-only display layer
@@ -213,5 +222,5 @@ clean separation of concerns do not require a framework to achieve.
   backoff, but very large repositories (hundreds of outdated dependencies) may
   approach GitHub's secondary rate limits during a single run.
 - **Dashboard is read-only**: The dashboard displays run history and scores but
-  does not provide a UI for approving updates — that still happens via GitHub
-  Issue comments, which is intentional (one authoritative approval surface).
+  does not provide a UI for approving updates — approval happens via GitHub Issue
+  comments (`APPROVE` / `SKIP`) or the Bulk Approve workflow dispatch.

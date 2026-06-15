@@ -83,17 +83,22 @@ async function findApprovedRepos(octokit) {
     const fullName = repoMatch[1];
     const [issueOwner, repo] = fullName.split("/");
 
-    // Check for an APPROVE comment on this issue.
+    // Check comments for APPROVE / SKIP keywords.
     const { data: comments } = await octokit.rest.issues.listComments({
       owner: issueOwner,
       repo,
       issue_number: issue.number,
     });
 
-    const isApproved = comments.some((c) =>
-      (c.body ?? "").trim().toUpperCase().includes(GATE.APPROVE_KEYWORD)
-    );
+    const bodies = comments.map((c) => (c.body ?? "").trim().toUpperCase());
 
+    const isSkipped = bodies.some((b) => b.includes(GATE.SKIP_KEYWORD));
+    if (isSkipped) {
+      logger.info({ repo: fullName, issue: issue.number }, "Issue has SKIP comment — skipping");
+      continue;
+    }
+
+    const isApproved = bodies.some((b) => b.includes(GATE.APPROVE_KEYWORD));
     if (!isApproved) {
       logger.info({ repo: fullName, issue: issue.number, commentCount: comments.length }, "Issue has no APPROVE comment — skipping");
       continue;
