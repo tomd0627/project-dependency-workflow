@@ -456,9 +456,15 @@ async function checkTokenExpiry({ discordWebhook, ntfyTopic }) {
 
   if (daysUntilExpiry > NOTIFIER.PAT_EXPIRY_WARN_DAYS) return;
 
+  const patUrl = "https://github.com/settings/personal-access-tokens";
+  const ghRepo = process.env.GITHUB_REPOSITORY;
+  const secretsUrl = ghRepo
+    ? `https://github.com/${ghRepo}/settings/secrets/actions`
+    : "your repo → Settings → Secrets and variables → Actions";
+
   const message = daysUntilExpiry <= 0
-    ? `⚠️ dep-bot: GitHub token has EXPIRED. The pipeline will fail on the next run. Generate a new PAT at github.com/settings/tokens and update the GH_PAT secret in project-dependency-workflow Actions secrets.`
-    : `⚠️ dep-bot: GitHub token expires in ${daysUntilExpiry} day${daysUntilExpiry === 1 ? "" : "s"} (${expiryDate.toDateString()}). Generate a new PAT at github.com/settings/tokens and update the GH_PAT secret in project-dependency-workflow Actions secrets.`;
+    ? `⚠️ dep-bot: GitHub token has EXPIRED. The pipeline will fail on the next run. Generate a new PAT: ${patUrl} — then update GH_PAT and PAT_EXPIRY_DATE: ${secretsUrl}`
+    : `⚠️ dep-bot: GitHub token expires in ${daysUntilExpiry} day${daysUntilExpiry === 1 ? "" : "s"} (${expiryDate.toDateString()}). Generate a new PAT: ${patUrl} — then update GH_PAT and PAT_EXPIRY_DATE: ${secretsUrl}`;
 
   logger.warn({ daysUntilExpiry, expiryDate: expiryDate.toISOString() }, "GitHub token expiry warning sent");
   await sendWebhookNotification({ discordWebhook, ntfyTopic, message });
