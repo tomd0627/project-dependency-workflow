@@ -79,9 +79,11 @@ flowchart TD
    ```
 
 6. **Deploy to GitHub Actions**
-   Push the repository to GitHub. Two workflows will be active:
+   Push the repository to GitHub. Four workflows will be active:
    - `.github/workflows/deps-bot.yml` — full pipeline scan, triggers on Mondays at 08:00 UTC (or manually)
    - `.github/workflows/approve-watcher.yml` — polls every 30 minutes for approved issues and creates PRs automatically
+   - `.github/workflows/bulk-approve.yml` — approves all open dep-bot issues in one shot and immediately triggers the watcher
+   - `.github/workflows/bulk-merge.yml` — squash-merges all open dep-bot PRs whose CI checks have passed
 
    Add the required secrets in your repository settings.
 
@@ -193,8 +195,11 @@ comment is never processed, even if it also has an `APPROVE` comment.
 
 For weeks with many open issues, the **Bulk Approve** workflow (`Actions → Bulk Approve
 → Run workflow`) comments `APPROVE` on every open dep-bot issue that does not have a
-`SKIP` comment. This is equivalent to approving each issue individually and goes
-through the same watcher-to-PR pipeline.
+`SKIP` comment, then immediately triggers the Approval Watcher so PRs are created
+without waiting for its next 30-minute tick. Once the watcher finishes (~2–3 min) and
+CI passes on each PR, run the **Bulk Merge** workflow (`Actions → Bulk Merge → Run workflow`)
+to squash-merge everything in one shot. PRs that are still running CI or have conflicts
+are skipped and reported — re-run Bulk Merge once they resolve.
 
 ### Why vanilla JS for the dashboard (vs. React/Vue)?
 
