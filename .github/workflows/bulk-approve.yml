@@ -1,8 +1,14 @@
 name: Bulk Approve
 
 # Comments APPROVE on all open dep-bot issues that do not already have a SKIP
-# comment. The Approval Watcher picks up each approval within 30 minutes and
-# runs the full pipeline to create a PR.
+# comment, then immediately triggers the Approval Watcher so PRs are created
+# without waiting for its next 30-minute scheduled run.
+#
+# Full manual flow:
+#   1. Run this workflow  →  issues get approved, watcher fires automatically
+#   2. Wait ~2-3 minutes for the watcher to finish creating PRs
+#   3. Wait for CI checks to pass on each PR (varies per repo)
+#   4. Run Bulk Merge  →  all green PRs are squash-merged
 #
 # To exclude a repo before triggering this workflow, comment SKIP on its issue.
 
@@ -10,6 +16,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: write
   issues: write
 
 jobs:
@@ -76,3 +83,15 @@ jobs:
 
           echo ""
           echo "Done — approved: $approved | skipped (SKIP): $skipped | already approved: $already_approved"
+
+          # Kick off the Approval Watcher immediately so PRs are created now
+          # rather than waiting up to 30 minutes for its next scheduled run.
+          # Only bother if something was actually approved this run.
+          if [[ $approved -gt 0 ]]; then
+            echo ""
+            echo "Triggering Approval Watcher to create PRs..."
+            gh workflow run approve-watcher.yml \
+              --repo "$GITHUB_REPOSITORY"
+            echo "Watcher triggered — wait ~2-3 min for PRs to appear, then"
+            echo "wait for CI to pass before running Bulk Merge."
+          fi

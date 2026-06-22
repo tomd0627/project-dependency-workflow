@@ -1,11 +1,17 @@
 name: Bulk Merge
 
-# Merges all open dep-bot PRs that are conflict-free.
+# Merges all open dep-bot PRs whose CI checks have passed.
 # Neutral / informational checks (e.g. Netlify "Pages changed") do not block
 # merge — only actual conflicts or branch-protection failures do.
 #
-# Runs the same pipeline check the watcher uses: skips any PR whose branch
-# has conflicts so nothing broken lands on main.
+# IMPORTANT — run this only after PRs exist and CI has passed:
+#   1. Run Bulk Approve  →  issues approved, Approval Watcher fires automatically
+#   2. Wait ~2-3 minutes for the watcher to finish creating PRs
+#   3. Wait for CI checks to pass on each PR (varies per repo; check the PRs)
+#   4. Run this workflow  →  all green PRs are squash-merged
+#
+# PRs that are still running CI (BLOCKED) or have conflicts (DIRTY) are skipped
+# and reported in the summary — re-run this workflow once they resolve.
 
 on:
   workflow_dispatch:
@@ -55,6 +61,7 @@ jobs:
             # Check mergeability — CLEAN means no conflicts and required checks
             # pass. UNSTABLE means optional/neutral checks haven't resolved yet
             # (e.g. Netlify "Pages changed"), which is fine to merge.
+            # BLOCKED = CI still running; DIRTY = merge conflict. Both are skipped.
             state=$(gh pr view "$number" --repo "$repo" \
               --json mergeStateStatus --jq '.mergeStateStatus')
 
@@ -72,3 +79,6 @@ jobs:
 
           echo ""
           echo "Done — merged: $merged | skipped: $skipped"
+          if [[ $skipped -gt 0 ]]; then
+            echo "Re-run this workflow once skipped PRs finish CI or resolve conflicts."
+          fi
