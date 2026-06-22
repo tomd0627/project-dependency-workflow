@@ -223,11 +223,18 @@ export async function openPullRequest({
     body,
     head: branch,
     base: defaultBranch,
-    labels: PR.LABELS,
     draft,
   });
 
   logger.info({ owner, repo, prNumber: data.number, prUrl: data.html_url, draft }, "Pull request opened");
+
+  // pulls.create does not accept labels — apply them via the Issues API.
+  await octokit.rest.issues.addLabels({
+    owner,
+    repo,
+    issue_number: data.number,
+    labels: PR.LABELS,
+  });
 
   if (hasSecurityFixes) {
     await octokit.rest.issues.addLabels({

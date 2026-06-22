@@ -42,10 +42,10 @@ jobs:
           skipped=0
 
           while IFS= read -r repo; do
-            # List open PRs in this repo that carry both dep-bot labels.
+            # List all open PRs — filter by title below. We don't filter by
+            # label here because labels were not applied correctly before
+            # the publisher.js fix; relying on the title prefix is safe enough.
             prs=$(gh pr list --repo "$repo" \
-              --label "automated" \
-              --label "dependencies" \
               --state open \
               --json number,title \
               2>/dev/null || true)
