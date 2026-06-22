@@ -85,15 +85,25 @@ flowchart TD
    - `.github/workflows/bulk-approve.yml` — approves all open dep-bot issues in one shot and immediately triggers the watcher
    - `.github/workflows/bulk-merge.yml` — squash-merges all open dep-bot PRs whose CI checks have passed
 
-   Add the required secrets in your repository settings.
+   Add the following secrets in your repository settings (`Settings → Secrets and variables → Actions`):
+
+   | Secret | Required | Description |
+   |---|---|---|
+   | `GH_PAT` | Yes | Personal access token with `repo`, `issues`, `pull-requests`, and `workflow` scopes. Used by all four workflows to operate across repos. The `workflow` scope is required for Bulk Approve to auto-trigger the Approval Watcher. |
+   | `ANTHROPIC_API_KEY` | Yes | Anthropic API key for Claude analysis. |
+   | `DISCORD_WEBHOOK` | No | Full Discord webhook URL for push notifications. |
+   | `NTFY_TOPIC` | No | ntfy.sh topic name for push notifications. |
+   | `PAT_EXPIRY_DATE` | No | Expiry date of `GH_PAT` (e.g. `2026-06-29`). When set, the bot warns 14 days before expiry. Update alongside `GH_PAT` each renewal. |
 
 ---
 
 ## Environment Variables
 
+These apply to the Node.js pipeline process (local runs and the `deps-bot` workflow). GitHub Actions secrets used by the bulk workflows are documented in the setup section above.
+
 | Variable | Required | Description |
 |---|---|---|
-| `GITHUB_TOKEN` | Yes | GitHub PAT or Actions token. Needs `repo`, `issues`, and `pull-requests` write. |
+| `GITHUB_TOKEN` | Yes | GitHub PAT or Actions token for the pipeline process. In GitHub Actions this is automatically provided; for local runs use your `GH_PAT`. Needs `repo`, `issues`, and `pull-requests` write. |
 | `ANTHROPIC_API_KEY` | Yes | Anthropic API key for Claude analysis. |
 | `DISCORD_WEBHOOK` | No | Full Discord webhook URL for push notifications. Takes precedence over `notification_webhook` in config. |
 | `NTFY_TOPIC` | No | ntfy.sh topic name for push notifications. |
