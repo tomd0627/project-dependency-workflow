@@ -12,6 +12,9 @@ name: Bulk Merge
 #
 # PRs that are still running CI (BLOCKED) or have conflicts (DIRTY) are skipped
 # and reported in the summary — re-run this workflow once they resolve.
+#
+# Uses gh pr list (direct REST API) rather than gh search prs to avoid GitHub
+# search index lag, which can delay newly created PRs from appearing in results.
 
 on:
   workflow_dispatch:
@@ -32,50 +35,54 @@ jobs:
         run: |
           set -euo pipefail
 
-          echo "Searching for open dep-bot PRs..."
-
-          prs=$(gh search prs \
-            --label=automated \
-            --label=dependencies \
-            --state=open \
-            --owner=@me \
-            --limit=100 \
-            --json repository,number,title)
-
-          total=$(echo "$prs" | jq 'length')
-          echo "Found $total candidate PR(s)"
+          echo "Authenticated as: $(gh api user --jq '.login')"
+          echo "Fetching repos..."
 
           merged=0
           skipped=0
 
-          while IFS= read -r row; do
-            repo=$(echo "$row" | jq -r '.repository.nameWithOwner')
-            number=$(echo "$row" | jq -r '.number')
-            title=$(echo "$row" | jq -r '.title')
+          while IFS= read -r repo; do
+            # List open PRs in this repo that carry both dep-bot labels.
+            prs=$(gh pr list --repo "$repo" \
+              --label "automated" \
+              --label "dependencies" \
+              --state open \
+              --json number,title \
+              2>/dev/null || true)
 
-            # Only process dep-bot PRs.
-            if [[ "$title" != "deps:"* ]]; then
-              continue
-            fi
+            [[ -z "$prs" || "$prs" == "[]" ]] && continue
 
-            # Check mergeability — CLEAN means no conflicts and required checks
-            # pass. UNSTABLE means optional/neutral checks haven't resolved yet
-            # (e.g. Netlify "Pages changed"), which is fine to merge.
-            # BLOCKED = CI still running; DIRTY = merge conflict. Both are skipped.
-            state=$(gh pr view "$number" --repo "$repo" \
-              --json mergeStateStatus --jq '.mergeStateStatus')
+            while IFS= read -r row; do
+              [[ -z "$row" ]] && continue
 
-            if [[ "$state" == "CLEAN" || "$state" == "UNSTABLE" ]]; then
-              gh pr merge "$number" --repo "$repo" --squash --delete-branch \
-                --subject "$title"
-              echo "  MERGED   $repo#$number ($state)"
-              merged=$((merged + 1))
-            else
-              echo "  SKIPPED  $repo#$number — state: $state"
-              skipped=$((skipped + 1))
-            fi
+              number=$(echo "$row" | jq -r '.number')
+              title=$(echo "$row" | jq -r '.title')
 
-          done < <(echo "$prs" | jq -c '.[]')
+              # Only process dep-bot PRs.
+              if [[ "$title" != "deps:"* ]]; then
+                continue
+              fi
+
+              # Check mergeability — CLEAN means no conflicts and required checks
+              # pass. UNSTABLE means optional/neutral checks haven't resolved yet
+              # (e.g. Netlify "Pages changed"), which is fine to merge.
+              # BLOCKED = CI still running; DIRTY = merge conflict. Both are skipped.
+              state=$(gh pr view "$number" --repo "$repo" \
+                --json mergeStateStatus --jq '.mergeStateStatus')
+
+              if [[ "$state" == "CLEAN" || "$state" == "UNSTABLE" ]]; then
+                gh pr merge "$number" --repo "$repo" --squash --delete-branch \
+                  --subject "$title"
+                echo "  MERGED   $repo#$number ($state)"
+                merged=$((merged + 1))
+              else
+                echo "  SKIPPED  $repo#$number — state: $state"
+                skipped=$((skipped + 1))
+              fi
+
+            done < <(echo "$prs" | jq -c '.[]')
+
+          done < <(gh repo list --limit 100 --json nameWithOwner --jq '.[].nameWithOwner')
 
           echo ""
           echo "Done — merged: $merged | skipped: $skipped"
