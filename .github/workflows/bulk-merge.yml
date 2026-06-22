@@ -34,7 +34,7 @@ jobs:
             --state=open \
             --owner=@me \
             --limit=100 \
-            --json repository,number,title,headRefName)
+            --json repository,number,title)
 
           total=$(echo "$prs" | jq 'length')
           echo "Found $total candidate PR(s)"
@@ -46,7 +46,6 @@ jobs:
             repo=$(echo "$row" | jq -r '.repository.nameWithOwner')
             number=$(echo "$row" | jq -r '.number')
             title=$(echo "$row" | jq -r '.title')
-            branch=$(echo "$row" | jq -r '.headRefName')
 
             # Only process dep-bot PRs.
             if [[ "$title" != "deps:"* ]]; then
