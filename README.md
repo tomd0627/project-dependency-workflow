@@ -95,6 +95,13 @@ flowchart TD
    | `NTFY_TOPIC` | No | ntfy.sh topic name for push notifications. |
    | `PAT_EXPIRY_DATE` | No | Expiry date of `GH_PAT` (e.g. `2026-06-29`). When set, the bot warns 14 days before expiry. Update alongside `GH_PAT` each renewal. |
 
+   Add the following variables in the **Variables** tab of the same settings page:
+
+   | Variable | Required | Description |
+   |---|---|---|
+   | `NOTIFY_USERNAME` | No | GitHub username to @-mention in issue notifications. Falls back to `github_username` in `bot.config.json`. |
+   | `PAUSE_UNTIL` | No | Pauses all scheduled workflow runs. Set to a date (`2026-07-21`) to auto-resume on that date, or `indefinite` to pause until manually cleared. Delete the variable to resume. Manual `workflow_dispatch` runs always bypass this. |
+
 ---
 
 ## Environment Variables

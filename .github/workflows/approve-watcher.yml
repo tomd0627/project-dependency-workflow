@@ -16,7 +16,38 @@ permissions:
   pull-requests: write
 
 jobs:
+  check-pause:
+    runs-on: ubuntu-latest
+    outputs:
+      paused: ${{ steps.check.outputs.paused }}
+    steps:
+      - name: Check PAUSE_UNTIL
+        id: check
+        if: github.event_name == 'schedule'
+        env:
+          PAUSE_UNTIL: ${{ vars.PAUSE_UNTIL }}
+        run: |
+          if [[ -z "$PAUSE_UNTIL" ]]; then
+            echo "paused=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [[ "$PAUSE_UNTIL" == "indefinite" ]]; then
+            echo "Workflow paused indefinitely (PAUSE_UNTIL=indefinite). Clear the variable to resume."
+            echo "paused=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          today=$(date -u +%Y-%m-%d)
+          if [[ "$today" < "$PAUSE_UNTIL" ]]; then
+            echo "Workflow paused until $PAUSE_UNTIL (today: $today)."
+            echo "paused=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "PAUSE_UNTIL=$PAUSE_UNTIL has passed (today: $today) — resuming normally."
+            echo "paused=false" >> "$GITHUB_OUTPUT"
+          fi
+
   watch-approvals:
+    needs: check-pause
+    if: needs.check-pause.outputs.paused != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 120
 
